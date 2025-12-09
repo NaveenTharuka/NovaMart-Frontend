@@ -1,0 +1,11 @@
+.product-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.product-price {
+    color: #4A5568;
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}

@@ -1,0 +1,24 @@
+.list {
+    list-style: none;
+    position: relative;
+}
+
+/* Smooth dropdown animation */
+.absolute {
+    transition: opacity 0.2s ease-in-out;
+}
+
+/* Dropdown shadow */
+.absolute ul {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Prevent dropdown from closing when moving cursor into it */
+.list:hover .absolute {
+    display: block;
+}
+
+/* Make sure dropdown doesn't overlap */
+.list .relative {
+    z-index: 10;
+}
