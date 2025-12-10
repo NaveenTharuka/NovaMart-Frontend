@@ -1,5 +1,60 @@
 @import "tailwindcss";
 
-body {
-    background-color: rgb(255, 255, 255);
+
+/* Fixed header styles */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Main content padding for fixed header */
+.main-content {
+    padding-top: 160px;
+    /* Adjust based on banner + nav height */
+    min-height: 100vh;
+}
+
+/* Footer styles */
+.footer {
+    background: #111827;
+    /* bg-gray-900 */
+    color: white;
+    padding: 2rem 0;
+    /* py-8 */
+    margin-top: 4rem;
+    /* mt-16 */
+}
+
+.footer-content {
+    max-width: 80rem;
+    /* max-w-7xl */
+    margin: 0 auto;
+    padding: 0 1rem;
+    /* px-4 */
+    text-align: center;
+}
+
+.footer-title {
+    font-size: 1.125rem;
+    /* text-lg */
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    /* mb-2 */
+}
+
+.footer-text {
+    color: #9ca3af;
+    /* text-gray-400 */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-content {
+        padding-top: 140px;
+        /* Smaller header on mobile */
+    }
 }
