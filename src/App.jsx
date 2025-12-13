@@ -7,18 +7,25 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Cart from './pages/Cart';
 import ProductDetail from './pages/ProductDetail';
+import Search from './components/search.jsx';
+import './App.css';
 
 function App() {
   return (
     <Router>
-      {/* Fixed Header with your CSS classes */}
-      <div className="-mb-30">
+      {/* Fixed Header */}
+      <div className="top-0 left-0 w-full z-50 bg-white shadow-md">
         <Banner />
-        <Navigation />
+        <div className="flex items-center justify-between px-4 py-2 bg-gray-800">
+          <Navigation />
+          <div className="ml-auto mr-4">
+            <Search />
+          </div>
+        </div>
       </div>
 
-      {/* Main Content - Pushed down for fixed header */}
-      <div className="main-content">
+      {/* Main Content */}
+      <div className="main-content pt-32">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />

@@ -1,89 +1,74 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./productCard.css";
 
-function ProductCard({ category }) {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch("http://localhost:8080/api/products")
-            .then(response => response.json())
-            .then(data => {
-                const filteredProducts = category
-                    ? data.filter(product =>
-                        product.category.toLowerCase() === category.toLowerCase()
-                    )
-                    : data;
-                setProducts(filteredProducts);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error("Error fetching products:", error);
-                setLoading(false);
-            });
-    }, [category]);
-
-    if (loading) {
+function ProductCard({ products = [] }) {
+    if (!Array.isArray(products) || products.length === 0) {
         return (
-            <div className="product-grid">
-                {[...Array(8)].map((_, index) => (
-                    <div key={index} className="product-card skeleton">
-                        <div className="product-image"></div>
-                        <div className="product-content">
-                            <div className="skeleton-line"></div>
-                            <div className="skeleton-line short"></div>
-                            <div className="skeleton-button"></div>
-                        </div>
-                    </div>
-                ))}
+            <div className="no-products">
+                <p>No products found in this category.</p>
+                <Link to="/products" className="view-all-btn">View All Products</Link>
             </div>
         );
     }
 
     return (
         <div className="product-grid">
-            {products.length === 0 ? (
-                <div className="no-products">
-                    <p>No products found in this category.</p>
-                    <Link to="/products" className="view-all-btn">
-                        View All Products
-                    </Link>
-                </div>
-            ) : (
-                products.map(product => (
+            {products.map((product) => {
+                if (!product) return null;
+
+                const name = product?.name || "Unnamed Product";
+                const price =
+                    typeof product?.price === "number"
+                        ? product.price.toFixed(2)
+                        : "N/A";
+                const category = product?.category || "Uncategorized";
+                const description = product?.description || "No description available";
+                const quantity =
+                    typeof product?.quantity === "number" ? product.quantity : 0;
+                const image =
+                    product?.imageUrl || "https://picsum.photos/400/300";
+
+                return (
                     <div key={product.id} className="product-card">
+                        {/* Product Image */}
                         <div className="product-image">
-                            <img
-                                src={product.imageUrl || "https://picsum.photos/400/300"}
-                                alt={product.name}
-                            />
-                            {product.quantity === 0 && (
+                            <img src={image} alt={name} />
+                            {quantity === 0 && (
                                 <span className="out-of-stock-badge">Out of Stock</span>
                             )}
                         </div>
 
+                        {/* Product Content */}
                         <div className="product-content">
                             <div className="product-header">
-                                <h3 className="product-name">{product.name}</h3>
-                                <p className="product-price">${product.price.toFixed(2)}</p>
+                                <h3 className="product-name">{name}</h3>
+                                <p className="product-price">${price}</p>
                             </div>
 
-                            <p className="product-category">{product.category}</p>
-                            <p className="product-description">{product.description}</p>
+                            <p className="product-category">{category}</p>
+                            <p className="product-description">{description}</p>
 
                             <div className="product-footer">
-                                <p className={`product-quantity ${product.quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                                    {product.quantity > 0 ? `${product.quantity} in stock` : 'Out of stock'}
+                                <p
+                                    className={`product-quantity ${quantity > 0 ? "in-stock" : "out-of-stock"
+                                        }`}
+                                >
+                                    {quantity > 0
+                                        ? `${quantity} in stock`
+                                        : "Out of stock"}
                                 </p>
 
                                 <div className="product-buttons">
-                                    <Link to={`/product/${product.id}`} className="details-btn">
+                                    <Link
+                                        to={`/product/${product.id}`}
+                                        className="details-btn"
+                                    >
                                         View Details
                                     </Link>
                                     <button
-                                        className={`cart-btn ${product.quantity === 0 ? 'disabled' : ''}`}
-                                        disabled={product.quantity === 0}
+                                        className={`cart-btn ${quantity === 0 ? "disabled" : ""
+                                            }`}
+                                        disabled={quantity === 0}
                                     >
                                         Add to Cart
                                     </button>
@@ -91,8 +76,8 @@ function ProductCard({ category }) {
                             </div>
                         </div>
                     </div>
-                ))
-            )}
+                );
+            })}
         </div>
     );
 }

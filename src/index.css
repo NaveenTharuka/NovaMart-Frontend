@@ -58,3 +58,7 @@
         /* Smaller header on mobile */
     }
 }
+
+body {
+    background-image: linear-gradient(to right, #CBCBCB, #FFFFE3);
+}

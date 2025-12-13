@@ -4,27 +4,23 @@ import { Link } from "react-router-dom";
 function Cart() {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [products, setProducts] = useState({}); // Store product details
+    const [products, setProducts] = useState({});
 
     useEffect(() => {
-        // First, fetch cart items
         fetch('http://localhost:8080/api/cart/22222222-2222-2222-2222-222222222222')
             .then(response => response.json())
             .then(cartData => {
                 setCartItems(cartData);
 
-                // Then fetch details for each product
                 const productIds = cartData.map(item => item.productId);
 
-                // Fetch all product details
                 Promise.all(
                     productIds.map(productId =>
                         fetch(`http://localhost:8080/api/products/${productId}`)
                             .then(res => res.json())
-                            .catch(() => null) // Handle missing products
+                            .catch(() => null)
                     )
                 ).then(productDetails => {
-                    // Create a map of productId -> product details
                     const productMap = {};
                     productDetails.forEach((product, index) => {
                         if (product) {
@@ -41,14 +37,12 @@ function Cart() {
             });
     }, []);
 
-    // Calculate subtotal from cart items
     const subtotal = cartItems.reduce((total, item) => total + item.subTotal, 0);
     const shipping = subtotal > 50 ? 0 : 9.99;
     const tax = subtotal * 0.08;
     const total = subtotal + shipping + tax;
 
     const updateQuantity = async (productId, change) => {
-        // Call your API to update quantity
         try {
             const response = await fetch(`http://localhost:8080/api/cart/update`, {
                 method: 'POST',
@@ -61,7 +55,6 @@ function Cart() {
             });
 
             if (response.ok) {
-                // Update local state
                 setCartItems(items =>
                     items.map(item =>
                         item.productId === productId
@@ -80,7 +73,6 @@ function Cart() {
     };
 
     const removeItem = async (productId) => {
-        // Call API to remove item
         try {
             const response = await fetch(`http://localhost:8080/api/cart/remove`, {
                 method: 'DELETE',
@@ -130,7 +122,6 @@ function Cart() {
                     </div>
                 ) : (
                     <div className="grid lg:grid-cols-3 gap-8">
-                        {/* Cart Items */}
                         <div className="lg:col-span-2">
                             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                                 <div className="p-6 border-b border-gray-200">
@@ -201,7 +192,6 @@ function Cart() {
                             </div>
                         </div>
 
-                        {/* Order Summary */}
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-lg shadow-lg p-6">
                                 <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>

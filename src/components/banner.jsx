@@ -2,7 +2,7 @@ import './banner.css';
 
 function Banner() {
     return (
-        <div className="bg-linear-to-r from-blue-600 to-purple-600">
+        <div className="banner">
             <div className="max-w-7xl mx-auto p-10">
                 <div className="text-center p-10">
                     <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
