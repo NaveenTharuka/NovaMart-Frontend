@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/productCard.jsx";
+import './Home.css'
 
 function Home() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        fetch("http://localhost:8080/api/categories")
+            .then(res => res.json())
+            .then(data => setCategories(data))
+            .catch((e) => console.log(e))
+    }, []);
 
     useEffect(() => {
         fetch("http://localhost:8080/api/products")
@@ -30,7 +39,7 @@ function Home() {
                         Shop latest Products
                     </h1>
                     <p className="text-gray-600 text-lg">
-                        best - quality, best - products
+                        Simple. Fast. Reliable Shopping.
                     </p>
                 </div>
 
@@ -47,21 +56,18 @@ function Home() {
                 </div>
 
                 {/* Categories */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                    {[
-                        { title: "Electronics", desc: "Latest gadgets & devices" },
-                        { title: "Clothing", desc: "Fashion for everyone" },
-                        { title: "Home & Living", desc: "Stylish home essentials" }
-                    ].map((category, index) => (
-                        <div
-                            key={index}
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl p-6 text-white shadow-lg hover:scale-105 transition-transform"
-                        >
-                            <h4 className="text-xl font-bold mb-2">{category.title}</h4>
-                            <p className="text-blue-100">{category.desc}</p>
-                        </div>
-                    ))}
+                <div className="flex justify-center py-12">
+                    <div className="card">
+                        {categories.map((category) => (
+                            <p key={category.id}>
+                                <span>{category.name}</span>
+                            </p>
+                        ))}
+                    </div>
                 </div>
+
+
+
 
                 {/* Call to Action */}
                 <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-8 text-center text-white mb-12">

@@ -7,6 +7,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Cart from './pages/Cart';
 import ProductDetail from './pages/ProductDetail';
+import AddProduct from './pages/AddProduct.jsx';
 import Search from './components/search.jsx';
 import './App.css';
 
@@ -34,6 +35,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/addProduct" element={<AddProduct />} />
         </Routes>
 
         {/* Footer */}
@@ -49,5 +51,12 @@ function App() {
     </Router>
   );
 }
+
+
+// function App() {
+//   return (
+//     <AddProduct />
+//   )
+// }
 
 export default App;

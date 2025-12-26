@@ -25,7 +25,7 @@ function About() {
                             <div className="text-gray-700">Support</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-3xl font-bold text-blue-600 mb-2">Free</div>
+                            <div className="text-3xl font-bold text-blue-600 mb-2">Fast</div>
                             <div className="text-gray-700">Shipping</div>
                         </div>
                     </div>

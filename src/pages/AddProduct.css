@@ -1,0 +1,290 @@
+/* AddProduct.css */
+
+/* Container and layout styles */
+.flex {
+    display: flex;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+/* Main container styling */
+.detail-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    width: 100%;
+    max-width: 700px;
+    margin: 30px 20px;
+    transition: all 0.3s ease;
+}
+
+.detail-container:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Title styling */
+.add-product-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 40px 0 20px 0;
+    padding-bottom: 15px;
+    position: relative;
+}
+
+.add-product-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(to right, #3498db, #2ecc71);
+    border-radius: 2px;
+}
+
+/* Form headings */
+.detail-container h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Input and textarea styling */
+.detail-container input[type="text"],
+.detail-container input[type="number"],
+.detail-container textarea,
+.detail-container select {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.detail-container input[type="text"]:focus,
+.detail-container input[type="number"]:focus,
+.detail-container textarea:focus,
+.detail-container select:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.detail-container input[type="text"]::placeholder,
+.detail-container input[type="number"]::placeholder,
+.detail-container textarea::placeholder {
+    color: #95a5a6;
+    opacity: 0.8;
+}
+
+/* Textarea specific styling */
+.detail-container textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* Select dropdown styling */
+.detail-container select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 16px;
+    padding-right: 45px;
+    cursor: pointer;
+}
+
+.detail-container select option {
+    padding: 12px;
+    font-size: 16px;
+}
+
+/* Button styling */
+.submit-btn {
+    background: linear-gradient(to right, #3498db, #2ecc71);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+    background: linear-gradient(to right, #2980b9, #27ae60);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Form validation styling */
+.detail-container input:invalid:not(:placeholder-shown),
+.detail-container textarea:invalid:not(:placeholder-shown),
+.detail-container select:invalid:not(:placeholder-shown) {
+    border-color: #e74c3c;
+    background-color: #fff5f5;
+}
+
+.detail-container input:valid:not(:placeholder-shown),
+.detail-container textarea:valid:not(:placeholder-shown),
+.detail-container select:valid:not(:placeholder-shown) {
+    border-color: #2ecc71;
+}
+
+/* Number input specific styling */
+.detail-container input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.detail-container input[type="number"]::-webkit-outer-spin-button,
+.detail-container input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Loading state */
+@keyframes pulse {
+    0% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.6;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .detail-container {
+        padding: 25px;
+        margin: 20px 15px;
+    }
+
+    .add-product-title {
+        font-size: 2rem;
+        margin: 30px 0 15px 0;
+    }
+
+    .detail-container h1 {
+        font-size: 1.1rem;
+    }
+
+    .detail-container input[type="text"],
+    .detail-container input[type="number"],
+    .detail-container textarea,
+    .detail-container select {
+        padding: 12px 15px;
+        font-size: 15px;
+    }
+
+    .submit-btn {
+        padding: 14px 30px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-container {
+        padding: 20px;
+        margin: 15px 10px;
+    }
+
+    .add-product-title {
+        font-size: 1.8rem;
+        margin: 25px 0 10px 0;
+    }
+
+    .detail-container h1 {
+        font-size: 1rem;
+    }
+}
+
+/* Success and error message styling */
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: center;
+    border: 1px solid #c3e6cb;
+    animation: slideIn 0.3s ease;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: center;
+    border: 1px solid #f5c6cb;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form group spacing */
+.detail-container br {
+    display: none;
+}
+
+/* Alternative: Using margin for better spacing */
+.detail-container h1+* {
+    margin-top: 5px;
+}
+
+.detail-container input,
+.detail-container textarea,
+.detail-container select {
+    margin-bottom: 25px;
+}
