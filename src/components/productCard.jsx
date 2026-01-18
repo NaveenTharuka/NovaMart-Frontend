@@ -1,7 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import "./productCard.css";
+import { addToCart } from "../pages/ProductDetail";
+import useAuth from "../auth/UseAuth";
+import { useNavigate } from "react-router-dom";
 
 function ProductCard({ products = [] }) {
+
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
     if (!Array.isArray(products) || products.length === 0) {
         return (
             <div className="no-products">
@@ -69,6 +76,7 @@ function ProductCard({ products = [] }) {
                                         className={`cart-btn ${quantity === 0 ? "disabled" : ""
                                             }`}
                                         disabled={quantity === 0}
+                                        onClick={() => addToCart(user, product.id, 1, navigate)}
                                     >
                                         Add to Cart
                                     </button>
