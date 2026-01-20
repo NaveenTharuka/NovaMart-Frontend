@@ -11,6 +11,9 @@ export const CartProvider = ({ children }) => {
         try {
             setLoading(true);
             const res = await fetch(`http://localhost:8080/api/cart/${userId}`);
+            if (!res.ok) {
+                throw new Error("Failed to fetch cart");
+            }
             const data = await res.json();
             setCart(data);
         } catch (err) {

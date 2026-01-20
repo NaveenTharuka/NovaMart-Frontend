@@ -1,63 +1,34 @@
-/* Category Expand Card */
-.card {
-    width: 90%;
-    max-width: 1300px;
-    height: 700px;
+/* Home.css */
 
-    display: flex;
-    gap: 20px;
-    padding: 30px;
-
-    border-radius: 6px;
-    align-items: stretch;
-    font-size: 30px;
-    font-weight: 700;
+body {
+    font-family: 'Inter', sans-serif;
 }
 
-.card p {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background-image: url(/src/assets/Category/Electronics.jpg);
-    border: 1px solid #ff5a91;
-    border-radius: 20px;
-
+/* Hero button hover effect */
+button:hover {
     cursor: pointer;
-    overflow: hidden;
-    transition: flex 0.5s ease;
 }
 
-.card p:hover {
-    flex: 4;
+/* Product cards container */
+.grid {
+    display: grid;
+    gap: 2rem;
 }
 
-.card p span {
-    min-width: 14em;
-    padding: 0.5em;
-
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #ff568e;
-
-    transform: rotate(-90deg);
-    transition: transform 0.5s ease;
+/* Category buttons */
+button {
+    outline: none;
+    border: none;
 }
 
-.card p:hover span {
-    transform: rotate(0);
+/* Smooth shadow transitions */
+button,
+.card {
+    transition: all 0.3s ease;
 }
 
-/* Mobile */
-@media (max-width: 640px) {
-    .card {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .card p span {
-        transform: rotate(0);
-    }
+button:hover,
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
