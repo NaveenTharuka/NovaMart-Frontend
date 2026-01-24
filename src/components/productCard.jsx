@@ -33,9 +33,10 @@ function ProductCard({ product }) {
             <div className="product-content">
                 <h3 className="product-name">{name}</h3>
                 <p className="product-category">{category}</p>
-                <p className="product-price">${price}</p>
+                <p className="product-price">Rs {price}</p>
                 <p className="product-description">{description}</p>
 
+                {/* Footer */}
                 <div className="product-footer">
                     <p className={`product-quantity ${quantity > 0 ? "in-stock" : "out-of-stock"}`}>
                         {quantity > 0 ? `${quantity} in stock` : "Out of stock"}
