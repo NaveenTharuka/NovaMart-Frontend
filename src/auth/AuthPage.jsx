@@ -18,8 +18,22 @@ function AuthPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [transitioning, setTransitioning] = useState(false);
+    const { login, register, isTokenInvalid, logout } = useAuth();
+    const [token, setToken] = useState(null);
 
-    const { login, register } = useAuth();
+    useEffect(() => {
+        const storedToken = localStorage.getItem("token");
+        setToken(storedToken);
+
+        if (!storedToken || isTokenInvalid(storedToken)) {
+            navigate("/login");
+        } else {
+            navigate("/");
+        }
+    }, []);
+
+
+
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -67,13 +81,13 @@ function AuthPage() {
                 password: formData.password,
                 address: formData.address,
                 phoneNumber: formData.phoneNumber,
-                role: "USER" // You're sending ADMIN in your JSON, but form has USER
+                role: "USER"
             });
 
             res = await register(
                 formData.email,
                 formData.password,
-                formData.userName, // Now using userName field
+                formData.userName,
                 formData.address,
                 formData.phoneNumber,
                 "USER" // Changed to match your form's role

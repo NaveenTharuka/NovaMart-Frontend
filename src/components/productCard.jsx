@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { addToCart } from "../pages/ProductDetail";
+import { addToCart } from "../Utils/cartFunctions.js";
 import useAuth from "../auth/UseAuth";
 import { useNavigate } from "react-router-dom";
 import './productCard.css';

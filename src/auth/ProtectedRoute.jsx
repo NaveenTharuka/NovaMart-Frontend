@@ -1,16 +1,15 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import useAuth from "./UseAuth";
 
 const ProtectedRoute = ({ children }) => {
     const { user } = useAuth();
+    const location = useLocation();
 
-    // If not logged in, redirect to login page
+    // 🔒 Not logged in → redirect once
     if (!user) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Otherwise, render children
     return children;
 };
 

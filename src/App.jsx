@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout"; // Import Layout component
+import Layout from "./components/Layout";
 
 import Home from "./pages/Home";
 import Products from "./pages/Products";
@@ -20,9 +20,9 @@ import "./App.css";
 
 function App() {
     return (
-        <AuthProvider>
-            <CartProvider>
-                <Router>
+        <Router>
+            <AuthProvider>
+                <CartProvider>
                     <Layout>
                         <Routes>
                             <Route path="/" element={<Home />} />
@@ -38,9 +38,9 @@ function App() {
                             <Route path="/updateProduct/:id" element={<ProtectedRoute><UpdateProduct /></ProtectedRoute>} />
                         </Routes>
                     </Layout>
-                </Router>
-            </CartProvider>
-        </AuthProvider>
+                </CartProvider>
+            </AuthProvider>
+        </Router>
     );
 }
 
