@@ -6,16 +6,20 @@ import Footer from "./Footer";
 function Layout({ children }) {
     const location = useLocation();
     const isLoginPage = location.pathname === "/login";
+    const isAdminPage = location.pathname === "/userpage";
+
+    // Show Header/Footer only if NOT login or admin page
+    const showHeaderFooter = !(isLoginPage || isAdminPage);
 
     return (
         <>
-            {!isLoginPage && <Header />}
+            {showHeaderFooter && <Header />}
 
             <div className="main-content">
                 {children}
             </div>
 
-            {!isLoginPage && <Footer />}
+            {showHeaderFooter && <Footer />}
         </>
     );
 }

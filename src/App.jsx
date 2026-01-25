@@ -8,6 +8,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import AddProduct from "./pages/AddProduct.jsx";
 import UpdateProduct from "./pages/UpdateProduct.jsx";
+import UserPage from "./pages/UserPage.jsx";
 
 import Cart from "./cart/Cart";
 import AuthPage from "./auth/AuthPage";
@@ -33,6 +34,7 @@ function App() {
                             <Route path="/contact" element={<Contact />} />
                             <Route path="/login" element={<AuthPage />} />
 
+                            <Route path="/userpage" element={<ProtectedRoute><UserPage /></ProtectedRoute>} />
                             <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
                             <Route path="/addProduct" element={<ProtectedRoute><AddProduct /></ProtectedRoute>} />
                             <Route path="/updateProduct/:id" element={<ProtectedRoute><UpdateProduct /></ProtectedRoute>} />

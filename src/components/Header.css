@@ -41,6 +41,7 @@
     width: 38px;
     height: 38px;
     border-radius: 50%;
+    border: 3px solid #22c55e;
     background: linear-gradient(135deg, #22c55e, #3b82f6);
     display: flex;
     align-items: center;
@@ -134,9 +135,9 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.35rem 0.75rem;
-    border-radius: 9999px;
+    border-radius: 5px;
     background: linear-gradient(135deg, #22c55e, #3b82f6);
-    color: #020617;
+    color: #ffffff;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;

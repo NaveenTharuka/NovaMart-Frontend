@@ -41,6 +41,7 @@
 }
 
 .dropdown-menu.open {
+    margin-top: 25px;
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -51,6 +52,7 @@
 }
 
 .dropdown-menu li a {
+    padding: 4px;
     color: #fff;
     display: block;
 }

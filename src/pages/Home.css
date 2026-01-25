@@ -16,7 +16,7 @@
 }
 
 .hero-title {
-    font-size: 3rem;
+    font-size: 48px;
     font-weight: 800;
     background: linear-gradient(135deg, #22c55e, #38bdf8);
     -webkit-background-clip: text;
@@ -33,6 +33,7 @@
 
 .hero-btn {
     background: linear-gradient(135deg, #22c55e, #38bdf8);
+    margin-top: 20px;
     border: none;
     border-radius: 12px;
     padding: 0.75rem 2rem;

@@ -51,7 +51,9 @@ function Header() {
 
                 {/* Avatar / Login */}
                 {user ? (
-                    <div className="avatar">{user.userName[0].toUpperCase()}</div>
+                    <div className="avatar" onClick={() => navigate("/userpage")}>
+                        {user.userName[0].toUpperCase()}
+                    </div>
                 ) : (
                     <button className="login-btn" onClick={() => navigate("/login")}>
                         Login

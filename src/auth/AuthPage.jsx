@@ -19,20 +19,6 @@ function AuthPage() {
     const [loading, setLoading] = useState(false);
     const [transitioning, setTransitioning] = useState(false);
     const { login, register, isTokenInvalid, logout } = useAuth();
-    const [token, setToken] = useState(null);
-
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        setToken(storedToken);
-
-        if (!storedToken || isTokenInvalid(storedToken)) {
-            navigate("/login");
-        } else {
-            navigate("/");
-        }
-    }, []);
-
-
 
     const navigate = useNavigate();
 
