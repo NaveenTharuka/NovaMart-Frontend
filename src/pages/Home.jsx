@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/productCard.jsx";
+import Loader from "../components/Loader.jsx";
 import { Link } from "react-router-dom";
 import './Home.css';
 
@@ -55,10 +56,7 @@ function Home() {
             <section className="home-featured">
                 <h2>Featured Products</h2>
                 {loading ? (
-                    <div className="loading">
-                        <div className="spinner"></div>
-                        <p>Loading products...</p>
-                    </div>
+                    <Loader />
                 ) : (
                     <div className="product-grid">
                         {featuredProducts.map(product => (

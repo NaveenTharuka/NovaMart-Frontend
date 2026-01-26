@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import ProductCard from "../components/productCard.jsx";
+import Loader from "../components/Loader.jsx";
 
 function Products() {
     const [products, setProducts] = useState([]);
@@ -94,10 +95,7 @@ function Products() {
 
                 {/* Loading State */}
                 {loading ? (
-                    <div className="text-center py-12">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-                        <p className="text-gray-500">Loading products...</p>
-                    </div>
+                    <Loader />
                 ) : filteredProducts.length > 0 ? (
                     /* Grid of Products */
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

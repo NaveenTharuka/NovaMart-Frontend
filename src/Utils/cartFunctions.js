@@ -1,6 +1,13 @@
 // src/utils/cartFunctions.js
 export const addToCart = async (user, productId, quantity, navigate) => {
     try {
+
+        if (!user) {
+            alert("Please log in to add items to your cart.");
+            navigate("/login");
+            return;
+        }
+
         const response = await fetch(`http://localhost:8080/api/cart/${user.id}`, {
             method: "POST",
             headers: {
@@ -10,10 +17,6 @@ export const addToCart = async (user, productId, quantity, navigate) => {
             body: JSON.stringify({ productId, quantity }),
         });
 
-        if (response.ok) {
-            alert("Product added to cart!");
-            navigate("/cart");
-        }
     } catch (error) {
         console.error("Error adding to cart:", error);
     }

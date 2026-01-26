@@ -1,5 +1,4 @@
-// src/auth/AuthPage.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "./UseAuth";
 import "./AuthPage.css";
@@ -9,23 +8,22 @@ function AuthPage() {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
-        userName: "", // Changed from 'name' to 'userName'
+        userName: "",
         address: "",
         phoneNumber: "",
-        role: "",
-        confirmPassword: ""
+        confirmPassword: "",
     });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [transitioning, setTransitioning] = useState(false);
-    const { login, register, isTokenInvalid, logout } = useAuth();
 
+    const { login, register } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
-        if (error) setError("");
+        if (error) setError(""); // clear error only when user types
     };
 
     const toggleMode = () => {
@@ -33,15 +31,13 @@ function AuthPage() {
         setTimeout(() => {
             setIsLoginMode(!isLoginMode);
             setError("");
-            // Clear form data when switching modes
             setFormData({
                 email: "",
                 password: "",
                 userName: "",
                 address: "",
                 phoneNumber: "",
-                role: "",
-                confirmPassword: ""
+                confirmPassword: "",
             });
             setTransitioning(false);
         }, 300);
@@ -61,22 +57,13 @@ function AuthPage() {
         if (isLoginMode) {
             res = await login(formData.email, formData.password);
         } else {
-            console.log("Sending registration data:", {
-                userName: formData.userName,
-                email: formData.email,
-                password: formData.password,
-                address: formData.address,
-                phoneNumber: formData.phoneNumber,
-                role: "USER"
-            });
-
             res = await register(
                 formData.email,
                 formData.password,
                 formData.userName,
                 formData.address,
                 formData.phoneNumber,
-                "USER" // Changed to match your form's role
+                "USER"
             );
         }
 
@@ -85,65 +72,73 @@ function AuthPage() {
         if (res.success) {
             navigate("/");
         } else {
+            // show backend error message
             setError(res.error || (isLoginMode ? "Login failed" : "Signup failed"));
         }
     };
 
     return (
         <div className="item-container">
-            <div>
-                <div className="auth-logo">NovaMart</div>
-            </div>
+            <div className="auth-logo">NovaMart</div>
 
             <div className="auth-container">
-                <div className={`auth-form-container ${transitioning ? 'transitioning' : ''} ${isLoginMode ? 'login-mode' : 'signup-mode'}`}>
-
+                <div
+                    className={`auth-form-container ${transitioning ? "transitioning" : ""
+                        } ${isLoginMode ? "login-mode" : "signup-mode"}`}
+                >
                     {/* Mode Switcher */}
                     <div className="mode-switcher">
                         <button
-                            className={`mode-btn ${isLoginMode ? 'active' : ''}`}
+                            className={`mode-btn ${isLoginMode ? "active" : ""}`}
                             onClick={() => !isLoginMode && toggleMode()}
                             disabled={transitioning}
                         >
                             Login
                         </button>
                         <button
-                            className={`mode-btn ${!isLoginMode ? 'active' : ''}`}
+                            className={`mode-btn ${!isLoginMode ? "active" : ""}`}
                             onClick={() => isLoginMode && toggleMode()}
                             disabled={transitioning}
                         >
                             Sign Up
                         </button>
-                        <div className="mode-slider" style={{ transform: isLoginMode ? 'translateX(0)' : 'translateX(100%)' }} />
+                        <div
+                            className="mode-slider"
+                            style={{
+                                transform: isLoginMode ? "translateX(0)" : "translateX(100%)",
+                            }}
+                        />
                     </div>
 
-                    {/* Form Title */}
+                    {/* Form Title & Subtitle */}
                     <h1 className="auth-title">
-                        {isLoginMode ? 'Welcome Back' : 'Join Us'}
+                        {isLoginMode ? "Welcome Back" : "Join Us"}
                     </h1>
                     <p className="auth-subtitle">
-                        {isLoginMode ? 'Enter your credentials to continue' : 'Create your account to get started'}
+                        {isLoginMode
+                            ? "Enter your credentials to continue"
+                            : "Create your account to get started"}
                     </p>
 
                     {/* Error Message */}
-                    {error && <div className="error-message">❌ {error}</div>}
+                    {error && <div className="error-message">{error}</div>}
 
                     {/* Form */}
                     <form className="auth-form" onSubmit={handleSubmit}>
-                        {/* UserName Field (Only for Signup) */}
-                        <div className={`form-group name-field ${isLoginMode ? 'hidden' : ''}`}>
-                            <label>Username</label> {/* Changed label */}
-                            <input
-                                type="text"
-                                name="userName" // Changed from 'name' to 'userName'
-                                value={formData.userName}
-                                onChange={handleChange}
-                                placeholder="Enter your username"
-                                required={!isLoginMode}
-                            />
-                        </div>
+                        {!isLoginMode && (
+                            <div className="form-group">
+                                <label>Username</label>
+                                <input
+                                    type="text"
+                                    name="userName"
+                                    value={formData.userName}
+                                    onChange={handleChange}
+                                    placeholder="Enter your username"
+                                    required
+                                />
+                            </div>
+                        )}
 
-                        {/* Email Field */}
                         <div className="form-group">
                             <label>Email</label>
                             <input
@@ -156,7 +151,6 @@ function AuthPage() {
                             />
                         </div>
 
-                        {/* Password Field */}
                         <div className="form-group">
                             <label>Password</label>
                             <input
@@ -169,52 +163,48 @@ function AuthPage() {
                             />
                         </div>
 
-                        {/* Confirm Password Field (Only for Signup) */}
-                        <div className={`form-group confirm-password-field ${isLoginMode ? 'hidden' : ''}`}>
-                            <label>Confirm Password</label>
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                placeholder="Confirm your password"
-                                required={!isLoginMode}
-                            />
-                        </div>
+                        {!isLoginMode && (
+                            <>
+                                <div className="form-group">
+                                    <label>Confirm Password</label>
+                                    <input
+                                        type="password"
+                                        name="confirmPassword"
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        placeholder="Confirm your password"
+                                        required
+                                    />
+                                </div>
 
-                        <div className={`form-group ${isLoginMode ? 'hidden' : ''}`}>
-                            <label>Address</label>
-                            <textarea
-                                name="address"
-                                value={formData.address}
-                                onChange={handleChange}
-                                placeholder="Enter your address"
-                                required={!isLoginMode}
-                            />
-                        </div>
+                                <div className="form-group">
+                                    <label>Address</label>
+                                    <textarea
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        placeholder="Enter your address"
+                                        required
+                                    />
+                                </div>
 
-                        <div className={`form-group ${isLoginMode ? 'hidden' : ''}`}>
-                            <label>Phone Number</label>
-                            <input
-                                type="tel"
-                                name="phoneNumber"
-                                value={formData.phoneNumber}
-                                onChange={handleChange}
-                                placeholder="Enter your phone number"
-                                required={!isLoginMode}
-                            />
-                        </div>
+                                <div className="form-group">
+                                    <label>Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        name="phoneNumber"
+                                        value={formData.phoneNumber}
+                                        onChange={handleChange}
+                                        placeholder="Enter your phone number"
+                                        required
+                                    />
+                                </div>
+                            </>
+                        )}
 
                         {/* Submit Button */}
                         <button type="submit" disabled={loading || transitioning}>
-                            {loading ? (
-                                <>
-                                    <span className="spinner"></span>
-                                    {isLoginMode ? 'Logging in...' : 'Creating account...'}
-                                </>
-                            ) : (
-                                isLoginMode ? 'Login' : 'Sign Up'
-                            )}
+                            {loading ? <span className="spinner-btn"></span> : isLoginMode ? "Login" : "Sign Up"}
                         </button>
                     </form>
 
@@ -222,7 +212,7 @@ function AuthPage() {
                     <div className="mode-toggle">
                         {isLoginMode ? "Don't have an account?" : "Already have an account?"}
                         <button className="toggle-link" onClick={toggleMode} disabled={transitioning}>
-                            {isLoginMode ? 'Sign Up' : 'Login'}
+                            {isLoginMode ? "Sign Up" : "Login"}
                         </button>
                     </div>
                 </div>
