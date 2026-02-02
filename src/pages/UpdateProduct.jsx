@@ -1,4 +1,4 @@
-import './UpdateProduct.css';
+import styles from './UpdateProduct.module.css';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -22,7 +22,7 @@ function UpdateProduct() {
         id: '',
         name: '',
         description: '',
-        price: 0,
+        price: '',
         quantity: 0,
         category: ''
     });
@@ -104,17 +104,17 @@ function UpdateProduct() {
 
     if (loading) {
         return (
-            <div className="update-product-container">
-                <div className="loading">Loading product data...</div>
+            <div className={styles.updateProductContainer}>
+                <div className={styles.loading}>Loading product data...</div>
             </div>
         );
     }
 
     if (error && !updatedProduct.id) {
         return (
-            <div className="update-product-container">
-                <div className="error-message">{error}</div>
-                <button onClick={() => window.location.href = '/'} className="back-btn">
+            <div className={styles.updateProductContainer}>
+                <div className={styles.errorMessage}>{error}</div>
+                <button onClick={() => window.location.href = '/'} className={styles.backBtn}>
                     Go to Home
                 </button>
             </div>
@@ -122,116 +122,169 @@ function UpdateProduct() {
     }
 
     return (
-        <div className="update-product-container">
+        <div className={styles.updateProductContainer}>
             <h2>Update Product</h2>
 
-            {error && <div className="error-message">{error}</div>}
-            {success && <div className="success-message">Product updated successfully!</div>}
+            {error && <div className={styles.errorMessage}>{error}</div>}
+            {success && <div className={styles.successMessage}>Product updated successfully!</div>}
 
-            <form className="update-form" onSubmit={handleSubmit}>
-                <div className="form-row">
-                    <label htmlFor="id">Product ID</label>
-                    <input
-                        type="text"
-                        id="id"
-                        name="id"
-                        value={updatedProduct.id}
-                        readOnly
-                        className="readonly-input"
-                    />
+            <div className={styles.contentLayout}>
+                {/* Left Column: Form */}
+                <div className={styles.formSection}>
+                    <form className={styles.updateForm} onSubmit={handleSubmit}>
+                        <div className={styles.formRow}>
+                            <label htmlFor="id">Product ID</label>
+                            <input
+                                type="text"
+                                id="id"
+                                name="id"
+                                value={updatedProduct.id}
+                                readOnly
+                                className={styles.readonlyInput}
+                            />
+                        </div>
+
+                        <div className={styles.formRow}>
+                            <label htmlFor="name">Product Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                value={updatedProduct.name}
+                                onChange={handleChange}
+                                required
+                                disabled={isSubmitting}
+                            />
+                        </div>
+
+                        {/* Image URL Input */}
+                        <div className={styles.formRow}>
+                            <label htmlFor="imageUrl">Image URL</label>
+                            <input
+                                type="url"
+                                id="imageUrl"
+                                name="imageUrl"
+                                value={updatedProduct.imageUrl || ''}
+                                onChange={handleChange}
+                                placeholder="https://example.com/image.jpg"
+                                disabled={isSubmitting}
+                            />
+                        </div>
+
+                        <div className={styles.formRow}>
+                            <label htmlFor="description">Product Description</label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                value={updatedProduct.description}
+                                onChange={handleChange}
+                                rows="4"
+                                disabled={isSubmitting}
+                            />
+                        </div>
+
+                        <div className={styles.gridRow}>
+                            <div className={styles.formRow}>
+                                <label htmlFor="price">Price ($)</label>
+                                <input
+                                    type="number"
+                                    id="price"
+                                    name="price"
+                                    value={updatedProduct.price}
+                                    onChange={handleChange}
+                                    min="0"
+                                    step="0.01"
+                                    required
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+
+                            <div className={styles.formRow}>
+                                <label htmlFor="quantity">Quantity</label>
+                                <input
+                                    type="number"
+                                    id="quantity"
+                                    name="quantity"
+                                    value={updatedProduct.quantity}
+                                    onChange={handleChange}
+                                    min="0"
+                                    required
+                                    disabled={isSubmitting}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.formRow}>
+                            <label htmlFor="category">Category</label>
+                            <select
+                                id="category"
+                                name="category"
+                                value={updatedProduct.category}
+                                onChange={handleChange}
+                                required
+                                disabled={isSubmitting}
+                            >
+                                <option value="">Select a category</option>
+                                {categories.map(category => (
+                                    <option key={category.id || category.name} value={category.name} className={styles.dropdown}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={styles.formActions}>
+                            <button
+                                type="button"
+                                onClick={handleCancel}
+                                className={styles.cancelBtn}
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className={styles.submitBtn}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Updating...' : 'Update Product'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                <div className="form-row">
-                    <label htmlFor="name">Product Name</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={updatedProduct.name}
-                        onChange={handleChange}
-                        required
-                        disabled={isSubmitting}
-                    />
+                {/* Right Column: Preview */}
+                <div className={styles.previewSection}>
+                    <h3 className={styles.previewTitle}>Live Preview</h3>
+                    <div className={styles.previewCard}>
+                        <div className={styles.previewImageContainer}>
+                            <img
+                                src={updatedProduct.imageUrl || "https://picsum.photos/300/200"}
+                                alt="Product Preview"
+                                className={styles.previewImage}
+                                onError={(e) => (e.target.src = "https://via.placeholder.com/300x200?text=Error+Loading+Image")}
+                            />
+                            {updatedProduct.quantity === 0 && (
+                                <div className={styles.outOfStockBadge}>Out of Stock</div>
+                            )}
+                        </div>
+                        <div className={styles.previewContent}>
+                            <div className={styles.previewCategory}>{updatedProduct.category || "Category"}</div>
+                            <h4 className={styles.previewName}>{updatedProduct.name || "Product Name"}</h4>
+                            <p className={styles.previewDescription}>
+                                {updatedProduct.description
+                                    ? (updatedProduct.description.length > 80
+                                        ? updatedProduct.description.substring(0, 80) + "..."
+                                        : updatedProduct.description)
+                                    : "Product description will appear here..."}
+                            </p>
+                            <div className={styles.previewFooter}>
+                                <div className={styles.previewPrice}>Rs {Number(updatedProduct.price).toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div className="form-row">
-                    <label htmlFor="description">Product Description</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        value={updatedProduct.description}
-                        onChange={handleChange}
-                        rows="4"
-                        disabled={isSubmitting}
-                    />
-                </div>
-
-                <div className="form-row">
-                    <label htmlFor="price">Product Price ($)</label>
-                    <input
-                        type="number"
-                        id="price"
-                        name="price"
-                        value={updatedProduct.price}
-                        onChange={handleChange}
-                        min="0"
-                        step="0.01"
-                        required
-                        disabled={isSubmitting}
-                    />
-                </div>
-
-                <div className="form-row">
-                    <label htmlFor="quantity">Product Quantity</label>
-                    <input
-                        type="number"
-                        id="quantity"
-                        name="quantity"
-                        value={updatedProduct.quantity}
-                        onChange={handleChange}
-                        min="0"
-                        required
-                        disabled={isSubmitting}
-                    />
-                </div>
-
-                <div className="form-row">
-                    <label htmlFor="category">Product Category</label>
-                    <select
-                        id="category"
-                        name="category"
-                        value={updatedProduct.category}
-                        onChange={handleChange}
-                        required
-                        disabled={isSubmitting}
-                    >
-                        <option value="">Select a category</option>
-                        {categories.map(category => (
-                            <option key={category.id || category.name} value={category.name} className='dropdown'>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="form-actions">
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="cancel-btn"
-                        disabled={isSubmitting}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="submit-btn"
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting ? 'Updating...' : 'Update Product'}
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     );
 }

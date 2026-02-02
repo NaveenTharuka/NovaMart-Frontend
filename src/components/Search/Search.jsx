@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import "./search.css";
+import styles from './Search.module.css';
 
 function Search() {
     const [query, setQuery] = useState("");
@@ -48,49 +48,62 @@ function Search() {
     };
 
     return (
-        <div className="search-wrapper" ref={wrapperRef}>
-            <form onSubmit={handleSearch} className="search-box">
+        <div className={styles.searchWrapper} ref={wrapperRef}>
+            <form
+                onSubmit={handleSearch}
+                className={styles.searchForm}
+            >
                 <input
                     type="text"
                     placeholder="Search products..."
                     value={query}
+                    className={styles.searchInput}
                     onChange={(e) => {
                         setQuery(e.target.value);
                         setShowResults(e.target.value.trim().length > 2);
                     }}
                     onFocus={() => setShowResults(query.trim().length > 2)}
                 />
-                <button type="submit">🔍</button>
+                <button
+                    type="submit"
+                    className={styles.searchButton}
+                >
+                    🔍
+                </button>
             </form>
 
             {showResults && (
-                <div className="search-dropdown">
+                <div className={styles.dropdown}>
                     {loading ? (
-                        <div className="search-loading">Searching...</div>
+                        <div className={styles.loading}>Searching...</div>
                     ) : products.length ? (
                         <>
                             {products.map(p => (
                                 <div
                                     key={p.id}
-                                    className="search-item"
+                                    className={styles.resultItem}
                                     onClick={() => navigate(`/product/${p.id}`)}
                                 >
-                                    <img src={p.imageUrl || "https://picsum.photos/100"} alt={p.name} />
+                                    <img
+                                        src={p.imageUrl || "https://picsum.photos/100"}
+                                        alt={p.name}
+                                        className={styles.resultImg}
+                                    />
                                     <div>
-                                        <p>{p.name}</p>
-                                        <span>${p.price?.toFixed(2)}</span>
+                                        <p className={styles.resultName}>{p.name}</p>
+                                        <span className={styles.resultPrice}>${p.price?.toFixed(2)}</span>
                                     </div>
                                 </div>
                             ))}
                             <div
-                                className="search-view-all"
+                                className={styles.viewAll}
                                 onClick={() => navigate(`/products?search=${encodeURIComponent(query)}`)}
                             >
                                 View all results →
                             </div>
                         </>
                     ) : (
-                        <div className="search-loading">No results found</div>
+                        <div className={styles.noResults}>No results found</div>
                     )}
                 </div>
             )}

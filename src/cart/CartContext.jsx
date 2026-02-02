@@ -16,6 +16,7 @@ export const CartProvider = ({ children }) => {
             }
             const data = await res.json();
             setCart(data);
+            return
         } catch (err) {
             console.error("Fetch cart error:", err);
         } finally {

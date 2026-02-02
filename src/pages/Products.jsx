@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import ProductCard from "../components/productCard.jsx";
-import Loader from "../components/Loader.jsx";
+import ProductCard from "@/components/ProductCard/ProductCard";
+import Loader from "@/components/Loader/Loader";
+import styles from "./Products.module.css";
+import { getAllProducts, getProductById, addProduct, updateProduct, deleteProduct } from "@/api/product.api";
 
 function Products() {
     const [products, setProducts] = useState([]);
@@ -12,25 +14,31 @@ function Products() {
 
     // Fetch products
     useEffect(() => {
-        setLoading(true);
-        setError(null);
+        const fetchProducts = async () => {
+            setLoading(true);
+            setError(null);
 
-        fetch("http://localhost:8080/api/products")
-            .then(res => res.json())
-            .then(data => {
-                const allProducts = Array.isArray(data) ? data : data.products || [];
-                setProducts(allProducts);
+            try {
+                const result = await getAllProducts();
 
-                const uniqueCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
-                setCategories(uniqueCategories);
+                if (result.success) {
+                    const allProducts = Array.isArray(result.data) ? result.data : result.data?.products || [];
+                    setProducts(allProducts);
 
-                setLoading(false);
-            })
-            .catch(err => {
+                    const uniqueCategories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
+                    setCategories(uniqueCategories);
+                } else {
+                    setError(result.error || "Failed to load products");
+                }
+            } catch (err) {
                 console.error(err);
                 setError("Failed to load products. Please try again later.");
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+
+        fetchProducts();
     }, []);
 
     // Filter products by category
@@ -46,12 +54,12 @@ function Products() {
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-red-500 mb-4">{error}</p>
+            <div className={styles.errorContainer}>
+                <div className={styles.errorContent}>
+                    <p className={styles.errorMessage}>{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                        className={styles.retryButton}
                     >
                         Retry
                     </button>
@@ -61,22 +69,22 @@ function Products() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <section className="container mx-auto px-4 py-8">
+        <div className={styles.pageContainer}>
+            <section className={styles.contentWrapper}>
 
                 {/* Page Header */}
-                <div className="mb-8 mt-20">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-2">{getCategoryName()}</h2>
-                    <p className="text-gray-600">
+                <div className={styles.headerSection}>
+                    <h2 className={styles.pageTitle}>{getCategoryName()}</h2>
+                    <p className={styles.resultCount}>
                         {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"} found
                     </p>
 
                     {/* Category Filters */}
                     {categories.length > 0 && (
-                        <div className="mt-6 flex flex-wrap gap-2">
+                        <div className={styles.filtersContainer}>
                             <Link
                                 to="/products"
-                                className={`px-4 py-2 rounded-full ${!category ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+                                className={`${styles.filterChip} ${!category ? styles.filterChipActive : styles.filterChipInactive}`}
                             >
                                 All
                             </Link>
@@ -84,7 +92,7 @@ function Products() {
                                 <Link
                                     key={cat}
                                     to={`/products/${cat.toLowerCase()}`}
-                                    className={`px-4 py-2 rounded-full ${category === cat.toLowerCase() ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+                                    className={`${styles.filterChip} ${category === cat.toLowerCase() ? styles.filterChipActive : styles.filterChipInactive}`}
                                 >
                                     {cat}
                                 </Link>
@@ -98,23 +106,30 @@ function Products() {
                     <Loader />
                 ) : filteredProducts.length > 0 ? (
                     /* Grid of Products */
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {filteredProducts.map(product => (
-                            <ProductCard key={product.id} product={product} />
+                    <div className={styles.productGrid}>
+                        {filteredProducts.map((product, index) => (
+                            <div
+                                key={product.id}
+                                className={styles.animatedCard}
+                                style={{ animationDelay: `${index * 80}ms` }}
+                            >
+                                <ProductCard product={product} />
+                            </div>
                         ))}
                     </div>
+
                 ) : (
                     /* Empty State */
-                    <div className="text-center py-12">
-                        <p className="text-gray-500 text-lg mb-4">No products found.</p>
+                    <div className={styles.emptyState}>
+                        <p className={styles.emptyMessage}>No products found.</p>
                         {category && (
                             <div>
-                                <p className="text-gray-400 mb-4">
+                                <p className={styles.emptySubMessage}>
                                     No products found in the "{getCategoryName()}" category.
                                 </p>
                                 <Link
                                     to="/products"
-                                    className="inline-block px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+                                    className={styles.viewAllButton}
                                 >
                                     View All Products
                                 </Link>

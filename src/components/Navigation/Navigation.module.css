@@ -1,0 +1,130 @@
+.nav {
+    width: 100%;
+}
+
+.navList {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+    padding: 0;
+    margin: 0;
+}
+
+.navList.mobile {
+    flex-direction: column;
+    gap: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #031649, #0881b5);
+    /* Match header gradient */
+    padding: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 49;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mobileNavWrapper {
+    /* Helper class if needed for wrapper specific styling on mobile */
+}
+
+.navLink {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    position: relative;
+    display: block;
+}
+
+.navLink:hover {
+    color: #22c55e;
+}
+
+/* Dropdown */
+.dropdownItem {
+    position: relative;
+}
+
+.dropdownTitle {
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.dropdownItem:hover .dropdownTitle {
+    color: #22c55e;
+}
+
+.dropdownMenu {
+    position: absolute;
+    left: 0;
+    min-width: 180px;
+    background: linear-gradient(90deg, #031649, #3a7c89, #0881b5);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 50;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile adjustments via props or additional classes */
+.dropdownMenu.mobile {
+    position: relative;
+    top: 0;
+    width: 100%;
+    background: none;
+    box-shadow: none;
+    transform: none;
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+    display: none;
+    /* controlled via js/react state logic usually, or just visibility */
+}
+
+.dropdownMenu.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdownMenu.mobile.visible {
+    display: block;
+}
+
+.menuItem {
+    padding: 0.5rem 1rem;
+}
+
+.menuLink {
+    display: block;
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+}
+
+.menuLink:hover {
+    color: #22c55e;
+    background-color: rgba(255, 255, 255, 0.1);
+}

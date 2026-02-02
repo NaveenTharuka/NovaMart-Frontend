@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "./UseAuth";
-import "./AuthPage.css";
+import useAuth from "@/auth/UseAuth";
+import styles from "./AuthPage.module.css";
 
 function AuthPage() {
     const [isLoginMode, setIsLoginMode] = useState(true);
@@ -78,143 +78,158 @@ function AuthPage() {
     };
 
     return (
-        <div className="item-container">
-            <div className="auth-logo">NovaMart</div>
+        <div className={styles.container}>
+            <div className={styles.title}>NovaMart</div>
 
-            <div className="auth-container">
-                <div
-                    className={`auth-form-container ${transitioning ? "transitioning" : ""
-                        } ${isLoginMode ? "login-mode" : "signup-mode"}`}
-                >
-                    {/* Mode Switcher */}
-                    <div className="mode-switcher">
-                        <button
-                            className={`mode-btn ${isLoginMode ? "active" : ""}`}
-                            onClick={() => !isLoginMode && toggleMode()}
-                            disabled={transitioning}
-                        >
-                            Login
-                        </button>
-                        <button
-                            className={`mode-btn ${!isLoginMode ? "active" : ""}`}
-                            onClick={() => isLoginMode && toggleMode()}
-                            disabled={transitioning}
-                        >
-                            Sign Up
-                        </button>
-                        <div
-                            className="mode-slider"
-                            style={{
-                                transform: isLoginMode ? "translateX(0)" : "translateX(100%)",
-                            }}
+            <div className={`${styles.formCard} ${transitioning ? styles.transitioning : ""}`}>
+
+                {/* Mode Switcher */}
+                <div className={styles.modeSwitcher}>
+                    <button
+                        className={`${styles.modeBtn} ${isLoginMode ? styles.modeBtnActive : styles.modeBtnInactive}`}
+                        onClick={() => !isLoginMode && toggleMode()}
+                        disabled={transitioning}
+                    >
+                        Login
+                    </button>
+                    <button
+                        className={`${styles.modeBtn} ${!isLoginMode ? styles.modeBtnActive : styles.modeBtnInactive}`}
+                        onClick={() => isLoginMode && toggleMode()}
+                        disabled={transitioning}
+                    >
+                        Sign Up
+                    </button>
+                    {/* Slider */}
+                    <div
+                        className={styles.slider}
+                        style={{
+                            transform: isLoginMode ? "translateX(0)" : "translateX(100%)",
+                        }}
+                    />
+                </div>
+
+                {/* Form Title & Subtitle */}
+                <h1 className={styles.headerTitle}>
+                    {isLoginMode ? "Welcome Back" : "Join Us"}
+                </h1>
+                <p className={styles.headerSubtitle}>
+                    {isLoginMode
+                        ? "Enter your credentials to continue"
+                        : "Create your account to get started"}
+                </p>
+
+                {/* Error Message */}
+                {error && (
+                    <div className={styles.error}>
+                        {error}
+                    </div>
+                )}
+
+                {/* Form */}
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    {!isLoginMode && (
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>Username</label>
+                            <input
+                                type="text"
+                                name="userName"
+                                value={formData.userName}
+                                onChange={handleChange}
+                                placeholder="Enter your username"
+                                required
+                                className={styles.input}
+                            />
+                        </div>
+                    )}
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Enter your email"
+                            required
+                            className={styles.input}
                         />
                     </div>
 
-                    {/* Form Title & Subtitle */}
-                    <h1 className="auth-title">
-                        {isLoginMode ? "Welcome Back" : "Join Us"}
-                    </h1>
-                    <p className="auth-subtitle">
-                        {isLoginMode
-                            ? "Enter your credentials to continue"
-                            : "Create your account to get started"}
-                    </p>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            placeholder={isLoginMode ? "Enter your password" : "Create a password"}
+                            required
+                            className={styles.input}
+                        />
+                    </div>
 
-                    {/* Error Message */}
-                    {error && <div className="error-message">{error}</div>}
-
-                    {/* Form */}
-                    <form className="auth-form" onSubmit={handleSubmit}>
-                        {!isLoginMode && (
-                            <div className="form-group">
-                                <label>Username</label>
+                    {!isLoginMode && (
+                        <>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Confirm Password</label>
                                 <input
-                                    type="text"
-                                    name="userName"
-                                    value={formData.userName}
+                                    type="password"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
                                     onChange={handleChange}
-                                    placeholder="Enter your username"
+                                    placeholder="Confirm your password"
                                     required
+                                    className={styles.input}
                                 />
                             </div>
-                        )}
 
-                        <div className="form-group">
-                            <label>Email</label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="Enter your email"
-                                required
-                            />
-                        </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Address</label>
+                                <textarea
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                    placeholder="Enter your address"
+                                    required
+                                    className={`${styles.input} ${styles.textarea}`}
+                                />
+                            </div>
 
-                        <div className="form-group">
-                            <label>Password</label>
-                            <input
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder={isLoginMode ? "Enter your password" : "Create a password"}
-                                required
-                            />
-                        </div>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>Phone Number</label>
+                                <input
+                                    type="tel"
+                                    name="phoneNumber"
+                                    value={formData.phoneNumber}
+                                    onChange={handleChange}
+                                    placeholder="Enter your phone number"
+                                    required
+                                    className={styles.input}
+                                />
+                            </div>
+                        </>
+                    )}
 
-                        {!isLoginMode && (
-                            <>
-                                <div className="form-group">
-                                    <label>Confirm Password</label>
-                                    <input
-                                        type="password"
-                                        name="confirmPassword"
-                                        value={formData.confirmPassword}
-                                        onChange={handleChange}
-                                        placeholder="Confirm your password"
-                                        required
-                                    />
-                                </div>
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        disabled={loading || transitioning}
+                        className={styles.submitBtn}
+                    >
+                        {loading ? <div className={styles.spinner} /> : (isLoginMode ? "Login" : "Sign Up")}
+                    </button>
+                </form>
 
-                                <div className="form-group">
-                                    <label>Address</label>
-                                    <textarea
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        placeholder="Enter your address"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Phone Number</label>
-                                    <input
-                                        type="tel"
-                                        name="phoneNumber"
-                                        value={formData.phoneNumber}
-                                        onChange={handleChange}
-                                        placeholder="Enter your phone number"
-                                        required
-                                    />
-                                </div>
-                            </>
-                        )}
-
-                        {/* Submit Button */}
-                        <button type="submit" disabled={loading || transitioning}>
-                            {loading ? <span className="spinner-btn"></span> : isLoginMode ? "Login" : "Sign Up"}
-                        </button>
-                    </form>
-
-                    {/* Mode Toggle Link */}
-                    <div className="mode-toggle">
-                        {isLoginMode ? "Don't have an account?" : "Already have an account?"}
-                        <button className="toggle-link" onClick={toggleMode} disabled={transitioning}>
-                            {isLoginMode ? "Sign Up" : "Login"}
-                        </button>
-                    </div>
+                {/* Mode Toggle Link */}
+                <div className={styles.toggleContainer}>
+                    {isLoginMode ? "Don't have an account?" : "Already have an account?"}
+                    <button
+                        className={styles.toggleBtn}
+                        onClick={toggleMode}
+                        disabled={transitioning}
+                    >
+                        {isLoginMode ? "Sign Up" : "Login"}
+                    </button>
                 </div>
             </div>
         </div>

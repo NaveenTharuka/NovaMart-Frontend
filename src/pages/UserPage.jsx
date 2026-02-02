@@ -1,67 +1,104 @@
-import "./UserPage.css";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../auth/UseAuth";
+import styles from "./UserPage.module.css";
 
 function UserPage() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     return (
-        <div className="userpage-container">
+        <div className={styles.userpageContainer}>
             {/* Sidebar */}
-            <aside className="sidebar">
-                <div className="back-btn-container">
-                    <button className="back-button" onClick={() => navigate(-1)}>
-                        ←
+            <aside className={styles.sidebar}>
+                <div className={styles.backBtnContainer}>
+                    <button className={styles.backButton} onClick={() => navigate(-1)}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
                     </button>
                 </div>
 
+                <h2 className={styles.title}>Admin Panel</h2>
 
-                <h2>Admin Panel</h2>
-                <ul className="menu">
-                    <li onClick={() => navigate("/dashboard")}>Dashboard</li>
-                    <li onClick={() => navigate("/products")}>Products</li>
-                    <li onClick={() => navigate("/categories")}>Categories</li>
-                    <li onClick={() => navigate("/orders")}>Orders</li>
-                    <li onClick={() => navigate("/users")}>Users</li>
+                <ul className={styles.menu}>
+                    <li className={styles.menuItem} onClick={() => navigate("/dashboard")}>
+                        <span>📊</span> Dashboard
+                    </li>
+                    <li className={styles.menuItem} onClick={() => navigate("/products")}>
+                        <span>🛍️</span> Products
+                    </li>
+                    <li className={styles.menuItem} onClick={() => navigate("/categories")}>
+                        <span>📂</span> Categories
+                    </li>
+                    <li className={styles.menuItem} onClick={() => navigate("/orders")}>
+                        <span>📦</span> Orders
+                    </li>
+                    <li className={styles.menuItem} onClick={() => navigate("/users")}>
+                        <span>👥</span> Users
+                    </li>
+                    {/* Logout for mobile menu flow (visible via CSS on mobile if desired, or duplicate) */}
+                    <li className={`${styles.menuItem} ${styles.mobileLogout}`} onClick={logout}>
+                        <span>🚪</span> Logout
+                    </li>
                 </ul>
 
-                <button className="logout-button" onClick={logout}>
+                <button className={styles.logoutButton} onClick={logout}>
                     Log Out
                 </button>
             </aside>
 
             {/* Main content */}
-            <main className="main-userpage-content">
-
-                <h1>
-                    Welcome, {user?.userName ? user.userName[0].toUpperCase() + user.userName.slice(1) : "Admin"}
+            <main className={styles.mainContent}>
+                <h1 className={styles.welcomeTitle}>
+                    Welcome, {user?.userName ? user.userName[0].toUpperCase() + user.userName.slice(1) : "Admin"} 👋
                 </h1>
 
-
                 {/* Top Cards */}
-                <div className="dashboard-cards">
-                    <div className="card" onClick={() => navigate("/orders")}>
+                <div className={styles.dashboardCards}>
+                    <div
+                        className={styles.card}
+                        onClick={() => navigate("/orders")}
+                        style={{ animationDelay: '0.1s' }}
+                    >
                         <h2>Orders</h2>
-                        <p>View all orders</p>
+                        <p>View and manage customer orders</p>
                     </div>
-                    <div className="card" onClick={() => navigate("/products")}>
-                        <h2>All Products</h2>
-                        <p>Manage all products</p>
+                    <div
+                        className={styles.card}
+                        onClick={() => navigate("/products")}
+                        style={{ animationDelay: '0.2s' }}
+                    >
+                        <h2>Products</h2>
+                        <p>Manage inventory and new arrivals</p>
+                    </div>
+                    <div
+                        className={styles.card}
+                        onClick={() => navigate("/users")}
+                        style={{ animationDelay: '0.3s' }}
+                    >
+                        <h2>Users</h2>
+                        <p>Manage registered customers</p>
                     </div>
                 </div>
 
                 {/* User Details */}
-                <div className="user-details">
-                    <h2>User Details</h2>
-                    <div className="detail">
-                        <span>Name:</span> <span>{user?.userName || "Admin"}</span>
+                <div className={styles.userDetails}>
+                    <h2 className={styles.sectionTitle}>User Details</h2>
+                    <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Name</span>
+                        <span className={styles.detailValue}>{user?.userName || "Admin"}</span>
                     </div>
-                    <div className="detail">
-                        <span>Email:</span> <span>{user?.email || "admin@example.com"}</span>
+                    <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Email</span>
+                        <span className={styles.detailValue}>{user?.email || "admin@example.com"}</span>
                     </div>
-                    <div className="detail">
-                        <span>Role:</span> <span>{user?.role || "Admin"}</span>
+                    <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Role</span>
+                        <span className={styles.detailValue}>{user?.role || "Admin"}</span>
+                    </div>
+                    <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Status</span>
+                        <span className={styles.detailValue} style={{ color: '#10b981' }}>Active</span>
                     </div>
                 </div>
             </main>

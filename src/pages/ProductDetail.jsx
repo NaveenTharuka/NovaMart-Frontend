@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useAuth from "../auth/UseAuth";
-import "./ProductDetail.css";
-import { addToCart, deleteProduct } from "../Utils/cartFunctions.js";
+import useAuth from "@/auth/UseAuth";
+import styles from "./ProductDetail.module.css";
+import { addToCart, deleteProduct } from "@/Utils/cartFunctions";
+import Loader from "@/components/Loader/Loader";
 
-
-
-// --- Main Component ---
 function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -15,13 +13,23 @@ function ProductDetail() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
-    const [imgLoaded, setImgLoaded] = useState(false);
+    const [selectedImage, setSelectedImage] = useState("");
+
+    // Derived state for gallery
+    const [galleryImages, setGalleryImages] = useState([]);
 
     useEffect(() => {
         fetch(`http://localhost:8080/api/products/id/${id}`)
             .then((res) => res.json())
             .then((data) => {
                 setProduct(data);
+                if (data.imageUrl) {
+                    setGalleryImages([data.imageUrl, data.imageUrl, data.imageUrl, data.imageUrl]); // Mocking multiple images for demo
+                    setSelectedImage(data.imageUrl);
+                } else {
+                    setGalleryImages(["https://picsum.photos/300/200", "https://picsum.photos/300/200", "https://picsum.photos/300/200", "https://picsum.photos/300/200"]); // Mocking multiple images for demo
+                    setSelectedImage("https://picsum.photos/300/200");
+                }
                 setLoading(false);
             })
             .catch((err) => {
@@ -30,108 +38,137 @@ function ProductDetail() {
             });
     }, [id]);
 
-    if (loading) {
-        return (
-            <div className="pd-loading">
-                <div className="spinner"></div>
-                <p>Loading product details...</p>
-            </div>
-        );
-    }
+    if (loading) return <div className={styles.loaderContainer}><Loader /></div>;
 
     if (!product) {
         return (
-            <div className="pd-loading">
+            <div className={styles.errorContainer}>
                 <h2>Product not found</h2>
-                <button onClick={() => navigate("/products")} className="pd-btn">
+                <button onClick={() => navigate("/products")} className={styles.backBtn}>
                     Browse Products
                 </button>
             </div>
         );
     }
 
+    const handleAddToCart = () => {
+        if (!user) return navigate("/login");
+        const res = addToCart(user, id, quantity, navigate);
+        if (res.success) {
+            alert("Product added to cart successfully!");
+        }
+    };
+
+    const handleBuyNow = () => {
+        if (!user) return navigate("/login");
+        navigate(`/orderpage/${id}`, { state: { product: product } });
+    };
+
     return (
-        <div className="pd-container">
-            <div className="pd-content">
-                {/* Admin Buttons */}
+        <div className={styles.pageWrapper}>
+            <div className={styles.container}>
+                {/* Admin Bar */}
                 {user?.role === "ADMIN" && (
-                    <div className="pd-admin-actions">
-                        <button
-                            onClick={() => navigate(`/updateProduct/${id}`)}
-                            className="pd-edit-btn"
-                        >
-                            Edit ✏️
-                        </button>
-                        <button onClick={() => deleteProduct(user, id, navigate)} className="pd-delete-btn">
-                            Delete ❌
-                        </button>
+                    <div className={styles.adminBar}>
+                        <span>Admin Actions:</span>
+                        <button onClick={() => navigate(`/updateProduct/${id}`)} className={styles.adminBtn}>Edit</button>
+                        <button onClick={() => deleteProduct(user, id, navigate)} className={`${styles.adminBtn} ${styles.deleteBtn}`}>Delete</button>
                     </div>
                 )}
 
-                {/* Product Image */}
-                <div className="pd-image-wrap">
-                    <img
-                        src={product.imageUrl || "https://picsum.photos/800"}
-                        alt={product.name}
-                        className={`pd-image ${imgLoaded ? "loaded" : ""}`}
-                        onLoad={() => setImgLoaded(true)}
-                    />
-                </div>
+                <div className={styles.grid}>
+                    {/* Left: Image Gallery */}
+                    <div className={styles.imageSection}>
+                        <div className={styles.mainImageContainer}>
+                            <img src={selectedImage} alt={product.name} className={styles.mainImage} />
 
-                {/* Product Details */}
-                <div className="pd-details">
-                    <h1 className="pd-name">{product.name}</h1>
-                    <div className="pd-price-wrap">
-                        <span className="pd-price">Rs {product.price?.toFixed(2)}</span>
-                        {product.originalPrice && (
-                            <span className="pd-original-price">${product.originalPrice.toFixed(2)}</span>
-                        )}
-                    </div>
-                    <p className="pd-description">{product.description || "No description available."}</p>
-                    <p>
-                        <span className="pd-label">Category:</span>{" "}
-                        <span className="pd-category">{product.category || "Uncategorized"}</span>
-                    </p>
-
-                    {/* Quantity & Buttons */}
-                    <div className="pd-actions">
-                        <div className="pd-quantity">
-                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
-                            <span>{quantity}</span>
-                            <button onClick={() => setQuantity(quantity + 1)}>+</button>
+                            {/* Tags/Badges */}
+                            <div className={styles.badges}>
+                                {product.quantity === 0 && <span className={styles.badgeOut}>Out of Stock</span>}
+                                {product.originalPrice && <span className={styles.badgeSale}>Sale</span>}
+                            </div>
                         </div>
 
-                        <button
-                            onClick={() => (user ? addToCart(user, id, quantity, navigate) : navigate("/login"))}
-                            className="pd-btn-add"
-                        >
-                            Add to Cart 🛒
-                        </button>
-                        <button
-                            onClick={() => (user ? addToCart(user, id, quantity, navigate) : navigate("/login"))}
-                            className="pd-btn-buy"
-                        >
-                            Buy Now
-                        </button>
+                        <div className={styles.galleryRow}>
+                            {galleryImages.map((img, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`${styles.thumbContainer} ${selectedImage === img ? styles.activeThumb : ''}`}
+                                    onClick={() => setSelectedImage(img)}
+                                >
+                                    <img src={img} alt="" className={styles.thumbImage} />
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Extra Info */}
-                    <div className="pd-extra-info">
-                        <p>
-                            <span>Brand:</span> {product.brand || "N/A"}
-                        </p>
-                        <p>
-                            <span>SKU:</span> {product.sku || "N/A"}
-                        </p>
-                        <p>
-                            <span>Availability:</span>{" "}
-                            <span className={product.quantity > 0 ? "in-stock" : "out-of-stock"}>
-                                {product.quantity > 0 ? "In Stock" : "Out of Stock"}
-                            </span>
-                        </p>
-                        <p>
-                            <span>Rating:</span> {product.rating || "N/A"}
-                        </p>
+                    {/* Right: Product Details */}
+                    <div className={styles.detailsSection}>
+                        <div className={styles.header}>
+                            <div className={styles.category}>{product.category || "Uncategorized"}</div>
+                            <h1 className={styles.title}>{product.name}</h1>
+
+                            <div className={styles.ratingRow}>
+                                <div className={styles.stars}>★★★★☆</div>
+                                <span className={styles.reviewCount}>({product.reviewCount || 42} reviews)</span>
+                            </div>
+                        </div>
+
+                        <div className={styles.priceBlock}>
+                            <span className={styles.currentPrice}>Rs {product.price?.toFixed(2)}</span>
+                            {product.originalPrice && (
+                                <span className={styles.originalPrice}>Rs {product.originalPrice.toFixed(2)}</span>
+                            )}
+                        </div>
+
+                        <div className={styles.description}>
+                            <p>{product.description || "No description available for this product."}</p>
+                        </div>
+
+                        {/* Controls */}
+                        <div className={styles.controls}>
+                            {/* Quantity */}
+                            <div className={styles.controlGroup}>
+                                <label>Quantity</label>
+                                <div className={styles.qtyInput}>
+                                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+                                    <span>{quantity}</span>
+                                    <button onClick={() => setQuantity(quantity + 1)}>+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className={styles.actions}>
+                            <button
+                                className={styles.addToCartBtn}
+                                onClick={handleAddToCart}
+                                disabled={product.quantity === 0}
+                            >
+                                Add to Cart
+                            </button>
+                            <button
+                                className={styles.buyNowBtn}
+                                onClick={handleBuyNow}
+                                disabled={product.quantity === 0}
+                            >
+                                Buy Now
+                            </button>
+                        </div>
+
+                        {/* Meta Info */}
+                        <div className={styles.metaInfo}>
+                            <div className={styles.metaRow}>
+                                <span>Availability:</span>
+                                <span className={product.quantity > 0 ? styles.inStock : styles.outStock}>
+                                    {product.quantity > 0 ? "In Stock" : "Out of Stock"}
+                                </span>
+                            </div>
+                            <div className={styles.metaRow}>
+                                <span>SKU:</span>
+                                <span>{product.sku || `PROD-${product.id}`}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

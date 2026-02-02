@@ -1,6 +1,6 @@
 // src/auth/AuthContext.jsx
 import React, { createContext, useEffect, useState } from "react";
-import * as authAPI from "../api/auth.api";
+import * as authAPI from "@/api/auth.api";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
@@ -51,16 +51,28 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem("token");
 
         if (!token) {
-            logout(false); // ❌ no redirect during startup
+            logout(false);
             return;
         }
 
-        const res = await authAPI.verifyToken(token);
+        try {
+            const res = await authAPI.verifyToken(token);
 
-        if (!res.success) {
-            logout(false); // ❌ no redirect during startup
+            if (!res.success) {
+                logout(false);
+                alert("Session expired. Please log in again.");
+            }
+
+        } catch (error) {
+            if (!error.response) {
+                console.warn("Server unreachable. Keeping user logged in.");
+                return;
+            }
+            logout(false);
+            alert("Something went wrong. Please log in again.");
         }
     };
+
 
     // 🔥 Run ONCE on app load
     useEffect(() => {

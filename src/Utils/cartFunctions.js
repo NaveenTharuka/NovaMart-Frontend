@@ -17,8 +17,11 @@ export const addToCart = async (user, productId, quantity, navigate) => {
             body: JSON.stringify({ productId, quantity }),
         });
 
+        alert("Product added to cart successfully!");
+
     } catch (error) {
         console.error("Error adding to cart:", error);
+        alert("Failed to add product to cart.");
     }
 };
 

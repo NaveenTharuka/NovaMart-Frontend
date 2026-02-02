@@ -1,26 +1,25 @@
-// components/Layout.jsx
 import { useLocation } from "react-router-dom";
-import Header from "./Header";
-import Footer from "./Footer";
+import Header from "@/components/Header/Header";
+import Footer from "@/components/Footer/Footer";
+import styles from './Layout.module.css';
 
 function Layout({ children }) {
     const location = useLocation();
     const isLoginPage = location.pathname === "/login";
     const isAdminPage = location.pathname === "/userpage";
 
-    // Show Header/Footer only if NOT login or admin page
     const showHeaderFooter = !(isLoginPage || isAdminPage);
 
     return (
-        <>
+        <div className={styles.wrapper}>
             {showHeaderFooter && <Header />}
 
-            <div className="main-content">
+            <main className={styles.main}>
                 {children}
-            </div>
+            </main>
 
             {showHeaderFooter && <Footer />}
-        </>
+        </div>
     );
 }
 

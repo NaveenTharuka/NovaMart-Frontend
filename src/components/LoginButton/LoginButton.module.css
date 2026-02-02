@@ -1,0 +1,31 @@
+.logoutBtn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #ef4444;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border: none;
+}
+
+.logoutBtn:hover {
+    background-color: #dc2626;
+}
+
+.loginBtn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(to right, #22c55e, #3b82f6);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.loginBtn:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-0.125rem);
+}

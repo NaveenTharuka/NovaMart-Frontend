@@ -1,0 +1,343 @@
+/* Global reset for this module scope */
+.userpageContainer {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, #031649, #0f4c75);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+.backBtnContainer {
+    margin-bottom: 2rem;
+}
+
+.backButton {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.backButton:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-3px);
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.menuItem {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.menuItem:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    opacity: 1;
+    transform: translateX(5px);
+}
+
+.logoutButton {
+    margin-top: auto;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(to right, #ef4444, #dc2626);
+    border: none;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.logoutButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.4);
+}
+
+/* Main content */
+.mainContent {
+    flex-grow: 1;
+    padding: 3rem;
+    background-color: #f1f5f9;
+    overflow-y: auto;
+}
+
+.welcomeTitle {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 2rem;
+    animation: fadeDown 0.6s ease-out;
+}
+
+/* Dashboard cards */
+.dashboardCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease-out backwards;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #3b82f6;
+}
+
+.card h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.card p {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: #f1f5f9;
+    border-radius: 0 0 0 100%;
+    z-index: 0;
+    opacity: 0.5;
+    transition: background 0.3s;
+}
+
+.card:hover::after {
+    background: #eff6ff;
+}
+
+/* User Details */
+.userDetails {
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    animation: fadeUp 0.8s ease-out backwards;
+}
+
+.sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detailRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 1rem;
+}
+
+.detailRow:last-child {
+    border-bottom: none;
+}
+
+.detailLabel {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.detailValue {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+/* Helpers */
+.mobileLogout {
+    display: none;
+}
+
+/* Animations */
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .userpageContainer {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        height: auto;
+        min-height: auto;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .backBtnContainer {
+        display: none;
+    }
+
+    .title {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .menu {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        gap: 1rem;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        align-items: center;
+    }
+
+    .menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    .menuItem {
+        white-space: nowrap;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 9999px;
+    }
+
+    .logoutButton {
+        display: none;
+    }
+
+    .mobileLogout {
+        display: flex;
+        background: rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+    }
+
+    .mainContent {
+        padding: 1.5rem;
+        padding-top: 1.5rem;
+    }
+
+    .welcomeTitle {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .dashboardCards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .userDetails {
+        padding: 1.5rem;
+    }
+
+    .detailRow {
+        flex-direction: column;
+        gap: 0.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 0.75rem 0;
+    }
+
+    .detailLabel {
+        font-size: 0.875rem;
+    }
+}
