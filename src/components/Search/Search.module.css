@@ -1,7 +1,14 @@
 .searchWrapper {
     position: relative;
-    width: 260px;
-    max-width: 100%;
+    min-width: 50px;
+    max-width: 260px;
+    width: 100%;
+}
+
+@media (max-width: 600px) {
+    .searchWrapper {
+        max-width: 120px;
+    }
 }
 
 .searchForm {
@@ -24,6 +31,7 @@
 .searchInput {
     flex: 1;
     background: transparent;
+    text-align: center;
     border: none;
     outline: none;
     color: #e5e7eb;

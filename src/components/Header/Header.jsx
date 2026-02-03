@@ -4,6 +4,7 @@ import Navigation from "@/components/Navigation/Navigation"
 import Search from "@/components/Search/Search";
 import useAuth from "@/auth/UseAuth";
 import styles from './Header.module.css';
+import Beams from "../Background";
 
 function Header() {
     const { user } = useAuth();

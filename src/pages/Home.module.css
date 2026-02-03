@@ -1,9 +1,8 @@
 /* ===== BASE STYLES ===== */
 .home-page {
-    background: var(--background);
-    color: var(--foreground);
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
+
 }
 
 .container {
@@ -21,32 +20,20 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background:
+    z-index: 0;
+    /* background:
         linear-gradient(to top, rgb(255, 255, 255), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%),
-        linear-gradient(135deg, #031649, #3a7c89, #08b5b5);
+        linear-gradient(135deg, #031649, #3a7c89, #08b5b5); */
 }
 
-/* Fixed background that stays */
-.hero-background {
-    position: fixed;
-    top: 0;
-    left: 0;
+.beams-bg {
+    position: absolute;
+    z-index: 1;
     width: 100%;
     height: 100vh;
-
-    z-index: -2;
+    scale: 1.1;
 }
 
-/* Floating decorative elements */
-.hero-float-1,
-.hero-float-2 {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.3;
-    z-index: -1;
-    pointer-events: none;
-}
 
 .hero-float-1 {
     top: 20%;
@@ -110,6 +97,7 @@
     line-height: 1.1;
     margin-bottom: 1.5rem;
     opacity: 0;
+    color: white;
 
 }
 
@@ -135,6 +123,7 @@
     margin: 0 auto 2.5rem;
     line-height: 1.6;
     opacity: 0;
+    color: rgba(196, 195, 195, 0.741);
 
 }
 
@@ -221,6 +210,7 @@
     padding: 5rem 0;
     position: relative;
 }
+
 
 /* Background images for sections */
 .section-bg-1 {
@@ -312,8 +302,8 @@
     padding: 0.75rem 2rem;
     border-radius: 9999px;
     border: 2px solid var(--primary);
-    background: transparent;
-    color: var(--primary);
+    background: rgb(83, 83, 83);
+    color: rgb(255, 255, 255);
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
@@ -321,8 +311,8 @@
 }
 
 .view-all-btn:hover {
-    background: var(--primary);
-    color: white;
+    background: black;
+    color: rgb(255, 255, 255);
     transform: translateY(-2px);
 }
 

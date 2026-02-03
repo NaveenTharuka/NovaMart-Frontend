@@ -10,6 +10,14 @@ function Search() {
     const navigate = useNavigate();
     const wrapperRef = useRef(null);
 
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 600);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
     useEffect(() => {
         if (query.trim().length > 2) {
             setLoading(true);
@@ -55,7 +63,7 @@ function Search() {
             >
                 <input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder={isMobile ? "Search" : "Search products..."}
                     value={query}
                     className={styles.searchInput}
                     onChange={(e) => {

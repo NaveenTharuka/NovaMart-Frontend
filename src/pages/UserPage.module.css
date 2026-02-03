@@ -10,7 +10,7 @@
 /* Sidebar */
 .sidebar {
     width: 280px;
-    background: linear-gradient(180deg, #031649, #0f4c75);
+    background: black;
     color: white;
     display: flex;
     flex-direction: column;

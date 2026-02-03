@@ -3,6 +3,7 @@ import ProductCard from "@/components/ProductCard/ProductCard";
 import Loader from "@/components/Loader/Loader";
 import { Link } from "react-router-dom";
 import styles from './Home.module.css';
+import Beams from "../components/Background";
 
 function Home() {
     const [products, setProducts] = useState([]);
@@ -132,7 +133,7 @@ function Home() {
             });
     }, []);
 
-    const featuredProducts = isMobile ? products.slice(0, 6) : products.slice(0, 5);
+    const featuredProducts = isMobile ? products.slice(0, 6) : products.slice(0, 4);
 
 
     return (
@@ -140,14 +141,20 @@ function Home() {
             {/* Hero Section with floating cards */}
             <section className={styles['hero-section']} ref={heroRef}>
                 {/* Fixed background layer */}
-                <div className={styles['hero-background']}></div>
 
-                {/* Floating elements */}
-                <div className={styles['hero-float-1']}></div>
-                <div className={styles['hero-float-2']}></div>
+                <div className={styles['beams-bg']}>
+                    <Beams
+                        beamWidth={3}
+                        beamHeight={30}
+                        beamNumber={20}
+                        lightColor="#ffffff"
+                        speed={2}
+                        noiseIntensity={1.75}
+                        scale={0.2}
+                        rotation={30}
+                    />
+                </div>
 
-                {/* Hero overlay */}
-                <div className={styles['hero-overlay']}></div>
 
                 {/* Content that fades out */}
                 <div className={`${styles['hero-content']} ${styles.container}`}>
