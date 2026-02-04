@@ -9,19 +9,17 @@ function Navigation({ mobile, toggleMenu }) {
     useEffect(() => {
         fetch("http://localhost:8080/api/categories")
             .then(res => res.json())
-            .then(data => setCategories(data))
-            .catch(e => console.log(e));
+            .then(setCategories)
+            .catch(console.error);
     }, []);
 
+    const toggleDropdown = () => setOpenDropdown(prev => !prev);
+
     return (
-        <nav className={`${styles.nav} ${mobile ? styles.mobileNavWrapper : ''}`}>
+        <nav className={styles.nav}>
             <ul className={`${styles.navList} ${mobile ? styles.mobile : ''}`}>
                 <li>
-                    <Link
-                        to="/"
-                        onClick={toggleMenu}
-                        className={styles.navLink}
-                    >
+                    <Link to="/" onClick={toggleMenu} className={styles.navLink}>
                         Home
                     </Link>
                 </li>
@@ -30,22 +28,12 @@ function Navigation({ mobile, toggleMenu }) {
                     className={styles.dropdownItem}
                     onMouseEnter={() => !mobile && setOpenDropdown(true)}
                     onMouseLeave={() => !mobile && setOpenDropdown(false)}
-                    onClick={() => mobile && setOpenDropdown(!openDropdown)}
+                    onClick={() => mobile && toggleDropdown()}
                 >
-                    <span className={`${styles.dropdownTitle} ${mobile ? styles.navLink : ''}`}>
-                        Products
-                    </span>
-                    <ul className={`
-                        ${styles.dropdownMenu} 
-                        ${openDropdown ? styles.visible : ""}
-                        ${mobile ? styles.mobile : ""}
-                    `}>
+                    <span className={styles.dropdownTitle}>Products</span>
+                    <ul className={`${styles.dropdownMenu} ${openDropdown ? styles.visible : ''} ${mobile ? styles.mobile : ''}`}>
                         <li className={styles.menuItem}>
-                            <Link
-                                to="/products"
-                                onClick={toggleMenu}
-                                className={styles.menuLink}
-                            >
+                            <Link to="/products" onClick={toggleMenu} className={styles.menuLink}>
                                 All Products
                             </Link>
                         </li>
@@ -64,23 +52,11 @@ function Navigation({ mobile, toggleMenu }) {
                 </li>
 
                 <li>
-                    <Link
-                        to="/about"
-                        onClick={toggleMenu}
-                        className={styles.navLink}
-                    >
-                        About
-                    </Link>
+                    <Link to="/about" onClick={toggleMenu} className={styles.navLink}>About</Link>
                 </li>
 
                 <li>
-                    <Link
-                        to="/contact"
-                        onClick={toggleMenu}
-                        className={styles.navLink}
-                    >
-                        Contact
-                    </Link>
+                    <Link to="/contact" onClick={toggleMenu} className={styles.navLink}>Contact</Link>
                 </li>
             </ul>
         </nav>
