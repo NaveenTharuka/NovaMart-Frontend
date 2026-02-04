@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import Loader from "@/components/Loader/Loader";
-import { Link } from "react-router-dom";
+import Beams from "@/components/Background";
 import styles from './Home.module.css';
-import Beams from "../components/Background";
 
 function Home() {
     const [products, setProducts] = useState([]);
@@ -17,7 +17,6 @@ function Home() {
     const aboutRef = useRef(null);
     const servicesRef = useRef(null);
     const categoriesRef = useRef(null);
-    const ctaRef = useRef(null);
 
     const [isVisible, setIsVisible] = useState({
         hero: true,
@@ -25,7 +24,6 @@ function Home() {
         about: false,
         services: false,
         categories: false,
-        cta: false
     });
 
     // Sample services data
@@ -36,17 +34,10 @@ function Home() {
         { icon: '⭐', title: "Premium Quality", description: "All products are quality checked & certified" }
     ];
 
-    // Category icons and colors declaration
     const categoryIcons = {
-        'Electronics': '💻',
-        'Fashion': '👕',
-        'Home & Kitchen': '🏠',
-        'Books': '📚',
-        'Sports': '⚽',
-        'Beauty': '💄',
-        'Watches': '⌚',
-        'Audio': '🎧',
-        'Cameras': '📷'
+        'Electronics': '💻', 'Fashion': '👕', 'Home & Kitchen': '🏠',
+        'Books': '📚', 'Sports': '⚽', 'Beauty': '💄',
+        'Watches': '⌚', 'Audio': '🎧', 'Cameras': '📷'
     };
 
     const categoryColors = {
@@ -64,30 +55,14 @@ function Home() {
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 768);
 
-        // Handle scroll for hero fade effect and scroll tracking
         const handleScroll = () => {
             setScrollY(window.scrollY);
 
-            if (heroRef.current) {
-                const heroHeight = heroRef.current.clientHeight;
-                const scrollPosition = window.scrollY;
-                const opacity = Math.max(0, 1 - (scrollPosition / (heroHeight * 0.5)));
-
-                // Using querySelector here is tricky with modules because class names change.
-                // Better to use ref for the content or state-based style.
-                // For now, let's skip the direct DOM manipulation via querySelector for styles inside module
-                // and rely on React state or ref if needed. 
-                // OR assuming the element is available via ref.
-                // We'll skip the opacity fade for now to ensure basic styling works first, 
-                // as querySelector('.hero-content') won't find the hashed class name.
-            }
-
-            // Check visibility of all sections
             const checkVisibility = (ref, key) => {
                 if (ref.current) {
                     const rect = ref.current.getBoundingClientRect();
-                    const isVisibleNow = rect.top <= window.innerHeight * 0.8;
-                    if (isVisibleNow && !isVisible[key]) {
+                    const visibleNow = rect.top <= window.innerHeight * 0.8;
+                    if (visibleNow && !isVisible[key]) {
                         setIsVisible(prev => ({ ...prev, [key]: true }));
                     }
                 }
@@ -97,16 +72,15 @@ function Home() {
             checkVisibility(aboutRef, 'about');
             checkVisibility(servicesRef, 'services');
             checkVisibility(categoriesRef, 'categories');
-            checkVisibility(ctaRef, 'cta');
         };
 
         window.addEventListener("resize", handleResize);
-        window.addEventListener('scroll', handleScroll);
-        handleScroll(); // Initial check
+        window.addEventListener("scroll", handleScroll);
+        handleScroll();
 
         return () => {
             window.removeEventListener("resize", handleResize);
-            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener("scroll", handleScroll);
         };
     }, [isVisible]);
 
@@ -115,10 +89,7 @@ function Home() {
         fetch("http://localhost:8080/api/categories")
             .then(res => res.json())
             .then(data => setCategories(data))
-            .catch(e => {
-                console.log(e);
-
-            });
+            .catch(console.log);
 
         // Fetch products
         fetch("http://localhost:8080/api/products")
@@ -135,53 +106,27 @@ function Home() {
 
     const featuredProducts = isMobile ? products.slice(0, 6) : products.slice(0, 4);
 
-
     return (
         <div className={styles['home-page']}>
-            {/* Hero Section with floating cards */}
+            {/* Hero Section */}
             <section className={styles['hero-section']} ref={heroRef}>
-                {/* Fixed background layer */}
-
                 <div className={styles['beams-bg']}>
-                    <Beams
-                        beamWidth={3}
-                        beamHeight={30}
-                        beamNumber={20}
-                        lightColor="#ffffff"
-                        speed={2}
-                        noiseIntensity={1.75}
-                        scale={0.2}
-                        rotation={30}
-                    />
+                    <Beams beamWidth={3} beamHeight={30} beamNumber={20} lightColor="#ffffff" speed={2} noiseIntensity={1.75} scale={0.2} rotation={30} />
                 </div>
 
-
-                {/* Content that fades out */}
-                <div className={`${styles['hero-content']} ${styles.container}`}>
+                <div className={styles['hero-content']} style={{ opacity: Math.max(0, 1 - scrollY / (heroRef.current?.clientHeight * 0.5)) }}>
                     <span className={`${styles['hero-badge']} ${isVisible.hero ? styles['animate-fade-up'] : ''}`}>
                         ✨ Welcome to Nova Store
                     </span>
-
                     <h1 className={`${styles['hero-title']} ${isVisible.hero ? styles['animate-fade-up-delay-1'] : ''}`}>
-                        <p>Discover the <span className={styles['gradient-text']}>Latest</span>
-                            <br />Products</p>
+                        Discover the <span className={styles['gradient-text']}>Latest</span><br />Products
                     </h1>
-
                     <p className={`${styles['hero-subtitle']} ${isVisible.hero ? styles['animate-fade-up-delay-2'] : ''}`}>
                         Simple. Fast. Reliable Shopping. Handpicked premium products curated just for you.
                     </p>
-
                     <div className={`${styles['hero-buttons']} ${isVisible.hero ? styles['animate-fade-up-delay-3'] : ''}`}>
-                        <Link to="/products">
-                            <button className={styles['hero-btn-primary']}>
-                                Explore Now
-                            </button>
-                        </Link>
-                        <Link to="/about">
-                            <button className={styles['hero-btn-secondary']}>
-                                Learn More
-                            </button>
-                        </Link>
+                        <Link to="/products"><button className={styles['hero-btn-primary']}>Explore Now</button></Link>
+                        <Link to="/about"><button className={styles['hero-btn-secondary']}>Learn More</button></Link>
                     </div>
                 </div>
             </section>
@@ -195,16 +140,10 @@ function Home() {
                         <p>Discover our handpicked selection of premium products loved by thousands of customers.</p>
                     </div>
 
-                    {loading ? (
-                        <Loader />
-                    ) : (
+                    {loading ? <Loader /> : (
                         <div className={styles['product-grid']}>
-                            {featuredProducts.map((product, index) => (
-                                <div
-                                    key={product.id}
-                                    className={`${styles['product-wrapper']} ${isVisible.featured ? styles['animate-scale-in'] : ''}`}
-                                    style={{ animationDelay: `${index * 0.1}s` }}
-                                >
+                            {featuredProducts.map((product, idx) => (
+                                <div key={product.id} className={`${styles['product-wrapper']} ${isVisible.featured ? styles['animate-scale-in'] : ''}`} style={{ animationDelay: `${idx * 0.1}s` }}>
                                     <ProductCard product={product} />
                                 </div>
                             ))}
@@ -212,16 +151,12 @@ function Home() {
                     )}
 
                     <div className={`${styles['section-footer']} ${isVisible.featured ? styles['animate-slide-up'] : ''}`}>
-                        <Link to="/products">
-                            <button className={styles['view-all-btn']}>
-                                View All Products
-                            </button>
-                        </Link>
+                        <Link to="/products"><button className={styles['view-all-btn']}>View All Products</button></Link>
                     </div>
                 </div>
             </section>
 
-            {/* Categories Section */}
+            {/* Categories */}
             {categories.length > 0 && (
                 <section className={`${styles['categories-section']} ${styles['section-bg-2']}`} ref={categoriesRef}>
                     <div className={styles.container}>
@@ -232,18 +167,13 @@ function Home() {
                         </div>
 
                         <div className={styles['categories-grid']}>
-                            {categories.map((category, index) => (
-                                <Link
-                                    key={category.id}
-                                    to={`/products/${category.name.toLowerCase()}`}
-                                    className={`${styles['category-card']} ${isVisible.categories ? styles['animate-scale-in'] : ''}`}
-                                    style={{ animationDelay: `${index * 0.1}s` }}
-                                >
+                            {categories.map((cat, idx) => (
+                                <Link key={cat.id} to={`/products/${cat.name.toLowerCase()}`} className={`${styles['category-card']} ${isVisible.categories ? styles['animate-scale-in'] : ''}`} style={{ animationDelay: `${idx * 0.1}s` }}>
                                     <div className={styles['category-card-inner']}>
-                                        <div className={`${styles['category-icon']} ${categoryColors[category.name] || 'from-blue-400 to-cyan-400'}`}>
-                                            {categoryIcons[category.name] || '📦'}
+                                        <div className={`${styles['category-icon']} ${categoryColors[cat.name] || 'from-blue-400 to-cyan-400'}`}>
+                                            {categoryIcons[cat.name] || '📦'}
                                         </div>
-                                        <h3>{category.name}</h3>
+                                        <h3>{cat.name}</h3>
                                         <p>Explore collection →</p>
                                     </div>
                                 </Link>
@@ -253,64 +183,34 @@ function Home() {
                 </section>
             )}
 
-            {/* About Us Section */}
+            {/* About Section */}
             <section className={`${styles['about-section']} ${styles['section-bg-3']}`} ref={aboutRef}>
                 <div className={styles.container}>
                     <div className={styles['about-grid']}>
                         <div className={`${styles['about-content']} ${isVisible.about ? styles['animate-slide-up'] : ''}`}>
                             <span className={styles['section-badge']}>About Us</span>
                             <h2>Who <span className={styles['gradient-text']}>We Are</span></h2>
-                            <p className={styles['about-text']}>
-                                We're more than just an online store. Nova Store is a curated marketplace
-                                bringing you the finest products from around the world. Our mission is to
-                                make premium shopping accessible, enjoyable, and secure for everyone.
-                            </p>
-                            <p className={styles['about-text']}>
-                                Founded with a passion for quality and customer satisfaction, we carefully
-                                select each product to ensure it meets our high standards. With thousands
-                                of happy customers worldwide, we continue to grow and improve every day.
-                            </p>
-
+                            <p className={styles['about-text']}>We're more than just an online store. Nova Store is a curated marketplace bringing you the finest products from around the world.</p>
+                            <p className={styles['about-text']}>Founded with a passion for quality and customer satisfaction, we carefully select each product to ensure it meets our high standards.</p>
                             <div className={styles.stats}>
-                                <div className={`${styles['stat-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`} style={{ animationDelay: '0.1s' }}>
-                                    <div className={styles['stat-number']}>10K+</div>
-                                    <div className={styles['stat-label']}>Happy Customers</div>
-                                </div>
-                                <div className={`${styles['stat-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`} style={{ animationDelay: '0.2s' }}>
-                                    <div className={styles['stat-number']}>100+</div>
-                                    <div className={styles['stat-label']}>Premium Products</div>
-                                </div>
-                                <div className={`${styles['stat-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`} style={{ animationDelay: '0.3s' }}>
-                                    <div className={styles['stat-number']}>1K+</div>
-                                    <div className={styles['stat-label']}>Deliveries</div>
-                                </div>
+                                <div className={`${styles['stat-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`}> <div className={styles['stat-number']}>10K+</div> <div className={styles['stat-label']}>Happy Customers</div> </div>
+                                <div className={`${styles['stat-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`}> <div className={styles['stat-number']}>100+</div> <div className={styles['stat-label']}>Premium Products</div> </div>
+                                <div className={`${styles['stat-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`}> <div className={styles['stat-number']}>1K+</div> <div className={styles['stat-label']}>Deliveries</div> </div>
                             </div>
                         </div>
 
-                        <div className={`${styles['about-stats']} ${isVisible.about ? styles['animate-slide-up'] : ''}`} style={{ animationDelay: '0.2s' }}>
-                            <div className={`${styles['stats-card']} ${styles['glass-card']}`}>
+                        <div className={`${styles['about-stats']} ${isVisible.about ? styles['animate-slide-up'] : ''}`}>
+                            <div className={`${styles['glass-card']} ${styles['stats-card']}`}>
                                 <div className={styles['stats-bg-1']}></div>
                                 <div className={styles['stats-bg-2']}></div>
-
                                 <div className={styles['stats-content']}>
-                                    {[
-                                        { label: "Quality Assurance", value: 98 },
-                                        { label: "Customer Satisfaction", value: 95 },
-                                        { label: "Fast Delivery Rate", value: 92 },
-                                    ].map((item, index) => (
-                                        <div className={`${styles['progress-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`} key={item.label} style={{ animationDelay: `${0.3 + (index * 0.1)}s` }}>
-                                            <div className={styles['progress-header']}>
-                                                <span>{item.label}</span>
-                                                <span className={styles['progress-value']}>{item.value}%</span>
+                                    {[{ label: "Quality Assurance", value: 98 }, { label: "Customer Satisfaction", value: 95 }, { label: "Fast Delivery Rate", value: 92 }]
+                                        .map((item, idx) => (
+                                            <div key={item.label} className={`${styles['progress-item']} ${isVisible.about ? styles['animate-slide-up'] : ''}`} style={{ animationDelay: `${0.3 + idx * 0.1}s` }}>
+                                                <div className={styles['progress-header']}><span>{item.label}</span><span className={styles['progress-value']}>{item.value}%</span></div>
+                                                <div className={styles['progress-bar']}><div className={styles['progress-fill']} style={{ width: `${item.value}%` }}></div></div>
                                             </div>
-                                            <div className={styles['progress-bar']}>
-                                                <div
-                                                    className={styles['progress-fill']}
-                                                    style={{ width: `${item.value}%` }}
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                        ))}
                                 </div>
                             </div>
                         </div>
@@ -318,7 +218,7 @@ function Home() {
                 </div>
             </section>
 
-            {/* Services Section */}
+            {/* Services */}
             <section className={`${styles['services-section']} ${styles['section-bg-4']}`} ref={servicesRef}>
                 <div className={styles.container}>
                     <div className={`${styles['section-header']} ${isVisible.services ? styles['animate-slide-up'] : ''}`}>
@@ -328,12 +228,8 @@ function Home() {
                     </div>
 
                     <div className={styles['services-grid']}>
-                        {services.map((service, index) => (
-                            <div
-                                key={service.title}
-                                className={`${styles['service-card']} ${isVisible.services ? styles['animate-slide-up'] : ''}`}
-                                style={{ animationDelay: `${index * 0.15}s` }}
-                            >
+                        {services.map((service, idx) => (
+                            <div key={service.title} className={`${styles['service-card']} ${isVisible.services ? styles['animate-slide-up'] : ''}`} style={{ animationDelay: `${idx * 0.15}s` }}>
                                 <div className={styles['service-icon']}>{service.icon}</div>
                                 <h3>{service.title}</h3>
                                 <p>{service.description}</p>

@@ -1,6 +1,8 @@
+/* ==============================
+   Base
+============================== */
 .nav {
     width: 100%;
-    padding: 0.5rem 1rem;
     position: relative;
     z-index: 50;
 }
@@ -8,67 +10,78 @@
 .navList {
     display: flex;
     list-style: none;
-    gap: 1.5rem;
-    padding: 0;
+    gap: 5px;
     margin: 0;
+    padding: 0;
     align-items: center;
 }
 
-/* Nav Links */
+.navItem {
+    display: flex;
+    align-items: center;
+}
+
+/* ==============================
+   Nav Links (Desktop + Mobile Base)
+============================== */
 .navLink {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    min-width: 96px;
+    padding: 0 14px;
+    border-radius: 10px;
     text-decoration: none;
     color: #fff;
     font-weight: 500;
     cursor: pointer;
-    transition: color 0.3s ease, text-shadow 0.3s ease;
-    padding: 6px 10px;
-    border-radius: 4px;
+    background: transparent;
+    white-space: nowrap;
+    transition: all 0.25s ease;
 }
 
 .navLink:hover {
-    color: #88cffa;
-    text-shadow: 0 0 6px rgba(136, 207, 250, 0.5);
-    background: rgba(255, 255, 255, 0.375);
-    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* Dropdown */
+/* ==============================
+   Dropdown (Desktop)
+============================== */
 .dropdownItem {
     position: relative;
-    margin-left: 10px;
 }
 
 .dropdownTitle {
-    font-weight: 500;
-    cursor: pointer;
-    color: #fff;
-    display: block;
-    transition: color 0.3s ease, text-shadow 0.3s ease;
+    background: transparent;
+    border: none;
+    font: inherit;
+    color: inherit;
+    padding: 0;
 }
 
 .dropdownMenu {
     position: absolute;
-    top: 100%;
-    margin-top: 25px;
+    top: 110%;
     left: 0;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(10px);
-    border-radius: 0.5rem;
-    padding: 0.5rem 0;
+    min-width: 190px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    padding: 0.4rem 0;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
+    transition: all 0.25s ease;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
     z-index: 50;
 }
 
 .dropdownMenu.visible {
-    width: auto;
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
-    background: transparent;
 }
 
 /* Dropdown items */
@@ -77,62 +90,95 @@
 }
 
 .menuLink {
-    display: block;
+    display: flex;
+    align-items: center;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
     color: #fff;
     text-decoration: none;
-    font-size: 0.875rem;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s, color 0.2s, text-shadow 0.3s;
+    white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
 .menuLink:hover {
-    color: #88cffa;
-    text-shadow: 0 0 6px rgba(136, 207, 250, 0.4);
-    background-color: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.12);
 }
 
-/* ===============================
-   Mobile Nav
-=============================== */
+/* ==============================
+   Mobile Navigation
+============================== */
 .navList.mobile {
     flex-direction: column;
-    width: 100%;
+    align-items: stretch;
     gap: 0.5rem;
-    align-items: flex-start;
-    /* Left aligned links */
-    background: rgba(0, 0, 0, 0.87);
-    border-radius: 0 0 10px 10px;
-    padding: 1rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.9);
+    border-radius: 0 0 14px 14px;
+    padding: 0.75rem;
+    width: 100%;
 }
 
-.navList.mobile .dropdownTitle,
 .navList.mobile .navLink,
-.navList.mobile .menuLink {
-    width: auto;
+.navList.mobile .dropdownTitle {
+    width: 100%;
+    /* full width */
+    padding: 0.6rem 0;
+    /* uniform spacing */
     text-align: left;
-    /* ensure left alignment */
+    font-size: 0.95rem;
+    /* mobile-friendly size */
 }
 
+/* 🔥 This is the key: equal mobile buttons */
+.navList.mobile .navLink {
+    width: 100%;
+    height: 44px;
+    /* iOS perfect tap size */
+
+    padding-left: 10px;
+    min-width: unset;
+    justify-content: left;
+    font-size: 0.95rem;
+}
+
+/* ==============================
+   Mobile Dropdown
+============================== */
 .dropdownMenu.mobile {
     position: relative;
-    margin-top: -0;
-    /* dropdown expands relative inside menu */
     top: 0;
     left: 0;
-    transform: none;
+    transform: translateY(-8px);
+    margin-left: 15px;
+    padding: 0;
+    width: 100%;
+    background: transparent;
     box-shadow: none;
-    padding-left: 1rem;
-    display: none;
+    border-radius: 0;
     max-height: 0;
     overflow: hidden;
+    opacity: 1;
+    visibility: visible;
     transition: max-height 0.3s ease;
 }
 
 .dropdownMenu.mobile.visible {
-    display: flex;
-    flex-direction: column;
+    transform: translateY(0px);
     max-height: 500px;
+}
+
+.navList.mobile .menuLink {
+    height: 40px;
     width: 100%;
+    font-size: 0.85rem;
+    justify-content: left;
+}
+
+/* ==============================
+   Small devices tweak
+============================== */
+@media (max-width: 480px) {
+    .navList.mobile .navLink {
+        font-size: 1.1rem;
+    }
 }
