@@ -1,10 +1,10 @@
-import axios from "axios";
+import { BASE_URL } from "./axios"
 
-const API_PRODUCT = 'http://localhost:8080/api/products'
+const PRODUCT_API = `${BASE_URL}/api/products`
 
 export const getAllProducts = async () => {
     try {
-        const res = await fetch(API_PRODUCT)
+        const res = await fetch(PRODUCT_API)
         const data = await res.json()
 
         return { success: true, data };
@@ -15,23 +15,43 @@ export const getAllProducts = async () => {
     }
 }
 
-
-export const getProductById = async (id) => {
+export const fetchProductByOrderItemId = async (orderItemId) => {
     try {
-        const res = await fetch(`${API_PRODUCT}/id/${id}`)
-        const data = await res.json()
-
+        const res = await fetch(`${PRODUCT_API}/order/${orderItemId}`);
+        const data = await res.json();
         return { success: true, data };
-    }
-    catch (err) {
-        console.log(err)
-        return { success: false, error: err.response?.data?.message || err.message };
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        return { success: false, error: error.response?.data?.message || error.message };
     }
 }
+
+export const fetchProductById = async (id) => {
+    try {
+        const response = await fetch(`${PRODUCT_API}/id/${id}`);
+        if (!response.ok) {
+            throw new Error(`Product not found (Status: ${response.status})`);
+        }
+        const data = await response.json();
+
+        return {
+            id: data.id,
+            name: data.name,
+            description: data.description,
+            price: parseFloat(data.price),
+            imageUrl: data.imageUrl,
+            category: data.category || '',
+            quantity: data.quantity,
+        };
+    } catch (error) {
+        console.error('API Error:', error);
+        return { success: false, error: error.response?.data?.message || error.message };
+    }
+};
 
 export const addProduct = async (product) => {
     try {
-        const res = await fetch(API_PRODUCT, {
+        const res = await fetch(PRODUCT_API, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -50,7 +70,7 @@ export const addProduct = async (product) => {
 
 export const updateProduct = async (product) => {
     try {
-        const res = await fetch(`${API_PRODUCT}/${product.id}`, {
+        const res = await fetch(`${PRODUCT_API}/id/${product.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -69,7 +89,7 @@ export const updateProduct = async (product) => {
 
 export const deleteProduct = async (id) => {
     try {
-        const res = await fetch(`${API_PRODUCT}/${id}`, {
+        const res = await fetch(`${PRODUCT_API}/id/${id}`, {
             method: 'DELETE'
         })
         const data = await res.json()
