@@ -1,0 +1,147 @@
+.wrapper {
+    min-height: 100vh;
+    background-color: #f9fafb;
+    /* bg-gray-50 */
+}
+
+.container {
+    max-width: 56rem;
+    /* max-w-4xl */
+    margin: 0 auto;
+    padding: 3rem 1rem;
+    /* py-12 px-4 */
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    /* shadow-lg */
+    padding: 2rem;
+    /* p-8 */
+}
+
+.title {
+    font-size: 1.875rem;
+    /* text-3xl */
+    line-height: 2.25rem;
+    font-weight: 700;
+    /* font-bold */
+    color: #111827;
+    /* text-gray-900 */
+    margin-bottom: 2rem;
+    /* mb-8 */
+}
+
+.contentGrid {
+    display: grid;
+    gap: 2rem;
+    /* gap-8 */
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .contentGrid {
+        grid-template-columns: 1fr 1fr;
+        /* md:grid-cols-2 */
+    }
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    /* text-xl */
+    line-height: 1.75rem;
+    font-weight: 600;
+    /* font-semibold */
+    margin-bottom: 1rem;
+    /* mb-4 */
+    color: #111827;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    /* space-y-4 */
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    display: block;
+    color: #374151;
+    /* text-gray-700 */
+    margin-bottom: 0.5rem;
+    /* mb-2 */
+}
+
+.input,
+.textarea {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    /* px-4 py-2 */
+    border: 1px solid #d1d5db;
+    /* border-gray-300 */
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    transition: all 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.input:focus,
+.textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    /* focus:border-blue-500 */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    /* focus:ring-2 focus:ring-blue-500 */
+}
+
+.button {
+    width: 100%;
+    background-color: #2563eb;
+    /* bg-blue-600 */
+    color: #ffffff;
+    font-weight: 600;
+    /* font-semibold */
+    padding: 0.75rem 1.5rem;
+    /* py-3 px-6 */
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    background-color: #1d4ed8;
+    /* hover:bg-blue-700 */
+}
+
+.infoStack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* space-y-6 */
+}
+
+.infoHeading {
+    font-weight: 600;
+    /* font-semibold */
+    color: #111827;
+    /* text-gray-900 */
+    margin-bottom: 0.5rem;
+    /* mb-2 */
+}
+
+.infoText {
+    color: #4b5563;
+    /* text-gray-600 */
+    margin: 0;
+}

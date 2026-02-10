@@ -14,6 +14,7 @@ import UpdateProduct from "@/features/products/pages/UpdateProduct/UpdateProduct
 
 // Order feature pages
 import OrderPage from "@/features/orders/pages/OrderPage/OrderPage";
+import OrderResponsePage from "@/features/orders/pages/OrderResponsePage/OrderResponsePage";
 import OrderDetail from "@/features/orders/pages/OrderDetail/OrderDetailPage";
 import MyOrders from "@/features/orders/pages/MyOrders/MyOrders";
 import Orders from "@/features/orders/pages/AllOrders/AllOrders";
@@ -50,6 +51,7 @@ function App() {
                             <Route path="/contact" element={<Contact />} />
                             <Route path="/login" element={<AuthPage />} />
                             <Route path="/orderpage/:id" element={<OrderPage />} />
+                            <Route path="/order/:orderId" element={<OrderResponsePage />} />
 
                             <Route path="/addReview/:id" element={<ProtectedRoute><AddReview /></ProtectedRoute>} />
                             <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />

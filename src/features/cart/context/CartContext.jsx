@@ -27,10 +27,10 @@ export const CartProvider = ({ children }) => {
 
     const updateQuantity = async (productId, quantity, userId) => {
         try {
-            const res = await fetch(`${CART_API}/${userId}/${productId}`, {
+            const res = await fetch(`${CART_API}/${userId}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ quantity }),
+                body: JSON.stringify({ productId, quantity }),
             });
 
             if (!res.ok) throw new Error("Failed to update quantity");
@@ -49,9 +49,12 @@ export const CartProvider = ({ children }) => {
 
     const removeItem = async (productId, userId) => {
         try {
-            const res = await fetch(`${CART_API}/${userId}/${productId}`, {
+            const res = await fetch(`${CART_API}/${userId}`, {
                 method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ productId })
             });
+
 
             if (!res.ok) throw new Error("Failed to remove item");
 

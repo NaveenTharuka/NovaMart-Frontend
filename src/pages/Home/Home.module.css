@@ -80,6 +80,13 @@
     -webkit-text-fill-color: transparent;
 }
 
+.handwritten-text {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: 1.2em;
+    padding: 0 0.2em;
+}
+
 .hero-buttons {
     display: flex;
     flex-direction: column;

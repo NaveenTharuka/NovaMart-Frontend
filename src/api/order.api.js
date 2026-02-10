@@ -54,6 +54,8 @@ export const getOrderDetails = async (orderId) => {
 
 export const placeOrder = async (orderData) => {
     try {
+        console.log('Placing single order:', orderData);
+
         const response = await fetch(ORDER_API, {
             method: 'POST',
             headers: {
@@ -62,15 +64,39 @@ export const placeOrder = async (orderData) => {
             body: JSON.stringify(orderData)
         });
 
-        if (!response.ok) {
-            throw new Error(`Order failed (Status: ${response.status})`);
+        console.log('Single order response status:', response.status);
+
+        // Check if response is empty (204 No Content)
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            if (response.ok) {
+                // Empty response but successful
+                return { success: true, status: response.status };
+            } else {
+                // Error with no JSON body
+                const errorText = await response.text();
+                throw new Error(`Order failed (Status: ${response.status}): ${errorText || 'No details'}`);
+            }
         }
-        return await response.json();
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(`Order failed: ${data.message || `Status: ${response.status}`}`);
+        }
+
+        return { success: true, data: data, status: response.status };
+
     } catch (error) {
-        console.error('Order API Error:', error);
-        throw error;
+        console.error('Single Order API Error:', error);
+        return {
+            success: false,
+            error: error.message,
+            rawError: error
+        };
     }
 };
+
 
 export const updateOrderStatus = async (orderId, status) => {
     try {
@@ -146,6 +172,59 @@ export const cancelOrder = async (orderId, reason = '') => {
         return {
             success: false,
             error: error.message
+        };
+    }
+};
+
+export const checkoutOrder = async (orderData) => {
+    try {
+        console.log('Placing cart order:', orderData);
+
+        const response = await fetch(`${ORDER_API}/cartItem`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        console.log('Cart order response status:', response.status);
+        console.log('Cart order response headers:', response.headers);
+
+        // Check if response is empty
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            if (response.ok) {
+                // Empty response but successful
+                console.log('Empty but successful response for cart order');
+                return {
+                    success: true,
+                    status: response.status,
+                    message: 'Order placed successfully'
+                };
+            } else {
+                // Error with no JSON body
+                const errorText = await response.text();
+                console.log('Error response text:', errorText);
+                throw new Error(`Cart order failed (Status: ${response.status}): ${errorText || 'No details'}`);
+            }
+        }
+
+        const data = await response.json();
+        console.log('Cart order response data:', data);
+
+        if (!response.ok) {
+            throw new Error(`Cart order failed: ${data.message || `Status: ${response.status}`}`);
+        }
+
+        return { success: true, data: data, status: response.status };
+
+    } catch (error) {
+        console.error('Cart Order API Error:', error);
+        return {
+            success: false,
+            error: error.message,
+            rawError: error
         };
     }
 };

@@ -21,7 +21,7 @@ function UserPage() {
                 <h2 className={styles.title}>Admin Panel</h2>
 
                 <ul className={styles.menu}>
-                    <li className={styles.menuItem} onClick={() => navigate("/dashboard")}>
+                    <li className={styles.menuItem} onClick={() => navigate("/userpage")}>
                         <span>📊</span> Dashboard
                     </li>
 
@@ -31,7 +31,7 @@ function UserPage() {
                         </li>
                     )}
                     {user.role === "ADMIN" && (
-                        <li className={styles.menuItem} onClick={() => navigate("/categories")}>
+                        <li className={styles.menuItem} onClick={() => navigate("/userpage")}>
                             <span>📂</span> Categories
                         </li>
                     )}

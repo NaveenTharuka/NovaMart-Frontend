@@ -4,8 +4,7 @@ import styles from './OrderPage.module.css';
 import useAuth from '@/features/auth/hooks/useAuth';
 import Loader from "../../../../components/Loader/Loader";
 import { fetchProductById } from '@/api/product.api';
-import { placeOrder } from '@/api/order.api';
-
+import { placeOrder, checkoutOrder } from '@/api/order.api';
 
 const OrderPage = () => {
     const { id } = useParams();
@@ -18,6 +17,7 @@ const OrderPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderItems, setOrderItems] = useState([]);
     const [error, setError] = useState(null);
+    const [orderType, setOrderType] = useState('single'); // 'single' or 'multiple'
 
     const [shippingInfo, setShippingInfo] = useState({
         fullName: user?.fullName || '',
@@ -50,28 +50,63 @@ const OrderPage = () => {
 
                 if (location.state?.products) {
                     // Multi-item order from Cart
-                    const items = location.state.products.map(p => ({
-                        ...p,
-                        id: p.productId || p.id, // Ensure ID is consistent
+                    console.log('Multi-item order from cart');
+                    setOrderType('multiple');
+                    const initialItems = location.state.products.map(p => ({
+                        id: p.productId || p.id,
+                        productId: p.productId || p.id,
                         name: p.productName || p.name,
-                        price: p.subTotal ? (p.subTotal / p.quantity) : p.price,
+                        price: p.price || (p.subTotal ? (p.subTotal / p.quantity) : 0),
                         imageUrl: p.imageUrl,
-                        quantity: p.quantity || 1
+                        quantity: p.quantity || 1,
+                        subTotal: p.subTotal || p.price * (p.quantity || 1),
+                        description: p.description || ''
                     }));
-                    setOrderItems(items);
+
+                    // Fetch details for items missing description
+                    const enhancedItems = await Promise.all(initialItems.map(async (item) => {
+                        if (!item.description) {
+                            try {
+                                console.log(`Fetching details for missing description: ${item.productId}`);
+                                const details = await fetchProductById(item.productId);
+                                if (details && details.description) {
+                                    return { ...item, description: details.description };
+                                }
+                            } catch (e) {
+                                console.error(`Failed to fetch details for ${item.name}`, e);
+                            }
+                        }
+                        return item;
+                    }));
+
+                    setOrderItems(enhancedItems);
                 } else if (location.state?.product) {
                     // Single item from Buy Now
+                    console.log('Single item from Buy Now');
+                    setOrderType('single');
                     const p = location.state.product;
                     setOrderItems([{
                         ...p,
-                        quantity: 1
+                        quantity: 1,
+                        productId: p.id || p.productId,
+                        subTotal: p.price || 0,
+                        name: p.name || p.productName,
+                        price: p.price || 0,
+                        description: p.description || ''
                     }]);
                 } else if (id) {
                     // Single item from URL params
+                    console.log('Single item from product page');
+                    setOrderType('single');
                     const productData = await fetchProductById(id);
                     setOrderItems([{
                         ...productData,
-                        quantity: 1
+                        quantity: 1,
+                        productId: productData.id || productData.productId,
+                        subTotal: productData.price || 0,
+                        name: productData.name || productData.productName,
+                        price: productData.price || 0,
+                        description: productData.description || ''
                     }]);
                 } else {
                     throw new Error('No items selected for checkout');
@@ -103,13 +138,11 @@ const OrderPage = () => {
             const item = newItems[index];
             const newQty = Math.max(1, item.quantity + change);
 
-            // Check stock if available
-            if (item.stock && item.stock < newQty) {
-                // Ideally show error per item, for now we just cap it
-                return prev;
-            }
-
-            newItems[index] = { ...item, quantity: newQty };
+            newItems[index] = {
+                ...item,
+                quantity: newQty,
+                subTotal: item.price * newQty
+            };
             return newItems;
         });
     };
@@ -133,35 +166,63 @@ const OrderPage = () => {
         setIsSubmitting(true);
 
         try {
-            const address = `${shippingInfo.phone}, ${shippingInfo.fullName}, ${shippingInfo.address}, ${shippingInfo.country}`;
+            const address = `${shippingInfo.fullName}, ${shippingInfo.phone}, ${shippingInfo.address}, ${shippingInfo.city}, ${shippingInfo.country}`;
+            const comment = `Payment Method: ${paymentMethod}, Shipping: ${selectedShippingOption.name}. Notes: ${orderNotes}`;
 
-            if (!address) {
-                alert('Invalid address');
-                return;
+            let result;
+
+            if (orderType === 'single' && orderItems.length === 1) {
+                // Use single order endpoint
+                const singleItem = orderItems[0];
+                const orderData = {
+                    userId: user.id,
+                    productId: singleItem.productId,
+                    quantity: singleItem.quantity,
+                    address: address,
+                    comment: comment
+                };
+
+                console.log('Placing single order via /api/order:', orderData);
+                result = await placeOrder(orderData);
+
+            } else {
+                // Use cart/checkout endpoint
+                const cartItems = orderItems.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity
+                }));
+
+                const orderData = {
+                    userId: user.id,
+                    address: address,
+                    comment: comment,
+                    cartItems: cartItems
+                };
+
+                console.log('Placing multi-order via /api/order/cartItem:', orderData);
+                result = await checkoutOrder(orderData);
             }
 
-            // Loop through all items and place orders individually
-            const promises = orderItems.map(item => {
-                const orderData = {
-                    userId: user.id || "guest",
-                    productId: item.id,
-                    quantity: item.quantity,
-                    address: address,
-                    comment: `Product: ${item.name}, Quantity: ${item.quantity}. ` +
-                        `Shipping: ${address}. ` +
-                        `Notes: ${orderNotes}`
-                };
-                return placeOrder(orderData);
-            });
+            console.log('Order result:', result);
 
-            await Promise.all(promises);
+            if (result.success) {
+                alert(`🎉 Order Placed Successfully! Total: Rs ${totalAmount.toFixed(2)}`);
 
-            alert(`🎉 Order(s) Placed Successfully! Total: Rs ${totalAmount.toFixed(2)}`);
-            navigate('/');
+                // Navigate based on order type
+                navigate(`/order/${result.data?.orderId || result.orderId}`, {
+                    state: {
+                        orderSuccess: true,
+                        orderId: result.data?.orderId || result.orderId,
+                        totalAmount: totalAmount
+                    }
+                });
+            } else {
+                throw new Error(result.error || 'Order failed');
+            }
 
         } catch (err) {
             console.error('Order submission failed:', err);
-            alert(`❌ One or more orders failed: ${err.message}`);
+            alert(`❌ Order failed: ${err.message}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -215,7 +276,7 @@ const OrderPage = () => {
                     <div className={styles.card}>
                         <div className={styles.cardHeader}>
                             <h2 className={styles.cardTitle}>
-                                <span className={styles.cardIcon}>📦</span> Product Details
+                                <span className={styles.cardIcon}>📦</span> Product Details ({orderItems.length} items)
                             </h2>
                         </div>
                         <div className={styles.cardBody}>
@@ -228,7 +289,7 @@ const OrderPage = () => {
                                     />
                                     <div className={styles.productInfo}>
                                         <h3 className={styles.productName}>{item.name}</h3>
-                                        <p className={styles.productDesc}>{item.description?.substring(0, 100)}...</p>
+                                        <p className={styles.productDesc}>{item.description}...</p>
 
                                         <div className={styles.productMeta}>
                                             <div className={styles.price}>Rs {item.price.toFixed(2)}</div>
@@ -244,6 +305,9 @@ const OrderPage = () => {
                                                     onClick={() => handleQuantityChange(index, 1)}
                                                     disabled={isSubmitting}
                                                 >+</button>
+                                            </div>
+                                            <div className={styles.itemTotal}>
+                                                Total: Rs {(item.price * item.quantity).toFixed(2)}
                                             </div>
                                         </div>
                                     </div>
@@ -276,7 +340,7 @@ const OrderPage = () => {
                                         className={styles.input}
                                         value={shippingInfo.phone}
                                         onChange={(e) => handleShippingInfoChange('phone', e.target.value)}
-                                        placeholder="+977..."
+                                        placeholder="+94771234567"
                                     />
                                 </div>
                                 <div className={`${styles.formGroup} ${styles.fullWidth}`}>
@@ -294,7 +358,7 @@ const OrderPage = () => {
                                         className={styles.input}
                                         value={shippingInfo.city}
                                         onChange={(e) => handleShippingInfoChange('city', e.target.value)}
-                                        placeholder="Kathmandu"
+                                        placeholder="Colombo"
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
@@ -368,6 +432,24 @@ const OrderPage = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Order Notes */}
+                    <div className={styles.card}>
+                        <div className={styles.cardHeader}>
+                            <h2 className={styles.cardTitle}>
+                                <span className={styles.cardIcon}>📝</span> Order Notes (Optional)
+                            </h2>
+                        </div>
+                        <div className={styles.cardBody}>
+                            <textarea
+                                className={styles.textarea}
+                                value={orderNotes}
+                                onChange={(e) => setOrderNotes(e.target.value)}
+                                placeholder="Any special instructions for your order..."
+                                rows="3"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Right Column - Summary */}
@@ -380,7 +462,7 @@ const OrderPage = () => {
                         </div>
                         <div className={styles.cardBody}>
                             <div className={styles.summaryRow}>
-                                <span>Subtotal</span>
+                                <span>Items ({orderItems.length})</span>
                                 <span>Rs {itemsSubtotal.toFixed(2)}</span>
                             </div>
                             <div className={styles.summaryRow}>
@@ -400,9 +482,9 @@ const OrderPage = () => {
                             <button
                                 className={styles.payButton}
                                 onClick={handlePlaceOrder}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || orderItems.length === 0}
                             >
-                                {isSubmitting ? 'Processing...' : `Pay Rs ${totalAmount.toFixed(2)}`}
+                                {isSubmitting ? 'Processing...' : `Place Order - Rs ${totalAmount.toFixed(2)}`}
                             </button>
 
                             <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.8rem', color: '#94a3b8' }}>

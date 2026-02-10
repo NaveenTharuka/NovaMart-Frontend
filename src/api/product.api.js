@@ -42,6 +42,8 @@ export const fetchProductById = async (id) => {
             imageUrl: data.imageUrl,
             category: data.category || '',
             quantity: data.quantity,
+            rating: data.rating || 0,
+            reviews: data.reviews || [],
         };
     } catch (error) {
         console.error('API Error:', error);
