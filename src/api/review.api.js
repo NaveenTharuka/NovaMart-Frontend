@@ -1,37 +1,28 @@
-import { BASE_URL } from "./axios";
-
-const REVIEW_API = `${BASE_URL}/api/review`
+// src/api/review.api.js
+import axiosInstance from './axiosInstance';
 
 export const getAllReviews = async () => {
     try {
-        const res = await fetch(REVIEW_API);
-        const data = res.data;
-        return data;
+        const response = await axiosInstance.get('/review');
+        return response.data;
     } catch (error) {
         console.error('Error fetching reviews:', error);
         throw error;
     }
-}
-
+};
 
 export const addReview = async (userId, productId, rating, comment) => {
     try {
-        const res = await fetch(REVIEW_API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, productId, rating, comment }),
-        });
+        const response = await axiosInstance.post('/review', { userId, productId, rating, comment });
 
-        if (!res.ok) {
-            throw new Error("Failed to add review");
+        // Handle empty responses
+        if (response.status === 204 || response.data === '') {
+            return { success: true };
         }
 
-        // Safely handle empty body
-        const text = await res.text();
-        return text ? JSON.parse(text) : { success: true };
+        return response.data;
     } catch (error) {
         console.error("Error adding review:", error);
         throw error;
     }
 };
-

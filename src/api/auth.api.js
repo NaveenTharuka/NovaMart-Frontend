@@ -1,67 +1,36 @@
-import { BASE_URL } from "@/api/axios";
-
-export const USER_API = `${BASE_URL}/api/user`;
-
-const handleResponse = async (res) => {
-    if (res.status === 401) {
-        localStorage.clear();
-        window.location.href = "/login";
-        throw new Error("Unauthorized");
-    }
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.message || "Request failed");
-
-    return data;
-};
+// src/api/auth.api.js
+import axiosInstance from './axiosInstance';
 
 export const login = async ({ email, password }) => {
     try {
-        const res = await fetch(`${USER_API}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-        });
-
-        const data = await handleResponse(res);
-        return { success: true, data };
-    } catch (err) {
-        return { success: false, error: err.message };
+        const response = await axiosInstance.post('/user/login', { email, password });
+        return { success: true, data: response.data };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message
+        };
     }
 };
 
 export const register = async ({ email, password, userName, address, phoneNumber, role }) => {
     try {
-        const res = await fetch(`${USER_API}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email,
-                password,
-                userName,
-                address,
-                phoneNumber,
-                role,
-            }),
+        const response = await axiosInstance.post('/user/register', {
+            email, password, userName, address, phoneNumber, role
         });
-
-        const data = await handleResponse(res);
-        return { success: true, data };
-    } catch (err) {
-        return { success: false, error: err.message };
+        return { success: true, data: response.data };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message
+        };
     }
 };
 
 export const verifyToken = async (token) => {
     try {
-        const res = await fetch(`${USER_API}/isTokenExpired`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token }),
-        });
-
-        const data = await handleResponse(res); // backend returns boolean
-        return { success: !data };
+        const response = await axiosInstance.post('/user/isTokenExpired', { token });
+        return { success: !response.data };
     } catch {
         return { success: false };
     }

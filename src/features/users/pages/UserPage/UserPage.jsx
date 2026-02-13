@@ -30,6 +30,13 @@ function UserPage() {
                             <span>🛍️</span> Products
                         </li>
                     )}
+
+                    {user.role === "ADMIN" && (
+                        <li className={styles.menuItem} onClick={() => navigate("/addProduct")}>
+                            <span>🛍️</span>Add Products
+                        </li>
+                    )}
+
                     {user.role === "ADMIN" && (
                         <li className={styles.menuItem} onClick={() => navigate("/userpage")}>
                             <span>📂</span> Categories

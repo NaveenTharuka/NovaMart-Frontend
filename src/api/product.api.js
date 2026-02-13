@@ -1,39 +1,28 @@
-import { BASE_URL } from "./axios"
-
-const PRODUCT_API = `${BASE_URL}/api/products`
+// src/api/product.api.js
+import axiosInstance from './axiosInstance';
 
 export const getAllProducts = async () => {
     try {
-        const res = await fetch(PRODUCT_API)
-        const data = await res.json()
-
-        return { success: true, data };
+        const response = await axiosInstance.get('/products/all');
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.message || error.message };
     }
-    catch (err) {
-        console.log(err)
-        return { success: false, error: err.response?.data?.message || err.message };
-    }
-}
+};
 
 export const fetchProductByOrderItemId = async (orderItemId) => {
     try {
-        const res = await fetch(`${PRODUCT_API}/order/${orderItemId}`);
-        const data = await res.json();
-        return { success: true, data };
+        const response = await axiosInstance.get(`/products/order/${orderItemId}`);
+        return { success: true, data: response.data };
     } catch (error) {
-        console.error('Error fetching product:', error);
         return { success: false, error: error.response?.data?.message || error.message };
     }
-}
+};
 
 export const fetchProductById = async (id) => {
     try {
-        const response = await fetch(`${PRODUCT_API}/id/${id}`);
-        if (!response.ok) {
-            throw new Error(`Product not found (Status: ${response.status})`);
-        }
-        const data = await response.json();
-
+        const response = await axiosInstance.get(`/products/id/${id}`);
+        const data = response.data;
         return {
             id: data.id,
             name: data.name,
@@ -46,61 +35,33 @@ export const fetchProductById = async (id) => {
             reviews: data.reviews || [],
         };
     } catch (error) {
-        console.error('API Error:', error);
         return { success: false, error: error.response?.data?.message || error.message };
     }
 };
 
 export const addProduct = async (product) => {
     try {
-        const res = await fetch(PRODUCT_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product)
-        })
-        const data = await res.json()
-
-        return { success: true, data };
+        const response = await axiosInstance.post('/products', product);
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.message || error.message };
     }
-    catch (err) {
-        console.log(err)
-        return { success: false, error: err.response?.data?.message || err.message };
-    }
-}
+};
 
 export const updateProduct = async (product) => {
     try {
-        const res = await fetch(`${PRODUCT_API}/id/${product.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product)
-        })
-        const data = await res.json()
-
-        return { success: true, data };
+        const response = await axiosInstance.put(`/products/id/${product.id}`, product);
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.message || error.message };
     }
-    catch (err) {
-        console.log(err)
-        return { success: false, error: err.response?.data?.message || err.message };
-    }
-}
+};
 
 export const deleteProduct = async (id) => {
     try {
-        const res = await fetch(`${PRODUCT_API}/id/${id}`, {
-            method: 'DELETE'
-        })
-        const data = await res.json()
-            .then(data => data)
-
-        return { success: true, data };
+        const response = await axiosInstance.delete(`/products/id/${id}`);
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, error: error.response?.data?.message || error.message };
     }
-    catch (err) {
-        console.log(err)
-        return { success: false, error: err.response?.data?.message || err.message };
-    }
-}
+};

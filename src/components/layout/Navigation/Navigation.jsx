@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Navigation.module.css";
+import { fetchCategories } from "../../../api/category.api"
 
 function Navigation({ mobile, toggleMenu }) {
     const [categories, setCategories] = useState([]);
     const [openDropdown, setOpenDropdown] = useState(false);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/categories")
-            .then(res => res.json())
-            .then(data => setCategories(data))
-            .catch(e => console.log(e));
+        const fetchCategoriesAll = async () => {
+            const res = await fetchCategories();
+            if (res.success) {
+                setCategories(res.data);
+            }
+        };
+        fetchCategoriesAll();
     }, []);
 
     return (

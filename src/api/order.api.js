@@ -1,229 +1,109 @@
-import { BASE_URL } from "./axios";
-
-const ORDER_API = `${BASE_URL}/api/order`
+// src/api/order.api.js
+import axiosInstance from './axiosInstance';
 
 export const getAllOrders = async () => {
-
     try {
-        const res = await fetch(`${ORDER_API}/all`);
-        const data = await res.json();
-
-        if (!res.ok) (
-            alert("fetch orders fail")
-        )
-
-        return data;
-
-    } catch (err) {
-        alert("Error")
-        console.log("Error encountered while fetching Orders")
-        return null
-    }
-}
-
-export const getOrderFromUserId = async (userId) => {
-    try {
-        const res = await fetch(`${ORDER_API}/user/${userId}`);
-
-        if (!res.ok) {
-            throw new Error("Failed to fetch user orders");
-        }
-
-        const data = await res.json();
-        return { success: true, data };
-    } catch (err) {
-        console.error("Error loading user orders:", err);
-        return { success: false, error: err };
+        const response = await axiosInstance.get('/order/all');
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        return null;
     }
 };
 
+export const getOrderFromUserId = async (userId) => {
+    try {
+        const response = await axiosInstance.get(`/order/user/${userId}`);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error("Error loading user orders:", error);
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message
+        };
+    }
+};
 
 export const getOrderDetails = async (orderId) => {
     try {
-        const res = await fetch(`${ORDER_API}/${orderId}`)
-        const data = await res.json();
-
-        localStorage.removeItem("orderId")
-
-        return { success: true, data }
-    } catch (err) {
-        console.log("faild to fetch order : " + orderId)
-        return { success: false, err }
+        const response = await axiosInstance.get(`/order/${orderId}`);
+        localStorage.removeItem("orderId");
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.error("Failed to fetch order:", orderId, error);
+        return {
+            success: false,
+            err: error.response?.data?.message || error.message
+        };
     }
-}
+};
 
 export const placeOrder = async (orderData) => {
     try {
         console.log('Placing single order:', orderData);
+        const response = await axiosInstance.post('/order', orderData);
 
-        const response = await fetch(ORDER_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        console.log('Single order response status:', response.status);
-
-        // Check if response is empty (204 No Content)
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            if (response.ok) {
-                // Empty response but successful
-                return { success: true, status: response.status };
-            } else {
-                // Error with no JSON body
-                const errorText = await response.text();
-                throw new Error(`Order failed (Status: ${response.status}): ${errorText || 'No details'}`);
-            }
+        // For empty responses (204 No Content)
+        if (response.status === 204 || response.data === '') {
+            return { success: true, status: response.status };
         }
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(`Order failed: ${data.message || `Status: ${response.status}`}`);
-        }
-
-        return { success: true, data: data, status: response.status };
-
+        return { success: true, data: response.data, status: response.status };
     } catch (error) {
         console.error('Single Order API Error:', error);
         return {
             success: false,
-            error: error.message,
+            error: error.response?.data?.message || error.message,
             rawError: error
         };
     }
 };
 
-
 export const updateOrderStatus = async (orderId, status) => {
     try {
-        console.log('Updating order status:', {
-            orderId,
-            status,
-            url: ORDER_API
-        });
-
-        // Backend UpdateOrderStatusDto expects orderId and status in body
-        const requestBody = {
-            orderId: orderId,
-            status: status
-        };
-
-        const response = await fetch(ORDER_API, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        console.log('Update response status:', response.status);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Update error response:', errorText);
-            throw new Error(`Failed to update status: ${response.status} - ${errorText}`);
-        }
-
-        // Your backend returns empty body (204 No Content), so we don't parse JSON
+        const response = await axiosInstance.put('/order', { orderId, status });
         return { success: true };
-
     } catch (error) {
         console.error('Error in updateOrderStatus:', error);
         return {
             success: false,
-            error: error.message
+            error: error.response?.data?.message || error.message
         };
     }
 };
 
 export const cancelOrder = async (orderId, reason = '') => {
     try {
-        console.log('Cancelling order:', orderId);
-
-        const requestBody = {
-            orderId: orderId,
-            status: 'CANCELED'
-        };
-
-        const response = await fetch(ORDER_API, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        console.log('Cancel response status:', response.status);
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Cancel error response:', errorText);
-            throw new Error(`Failed to cancel order: ${response.status} - ${errorText}`);
-        }
-
+        const response = await axiosInstance.put('/order', { orderId, status: 'CANCELED' });
         return { success: true };
-
     } catch (error) {
         console.error('Error in cancelOrder:', error);
         return {
             success: false,
-            error: error.message
+            error: error.response?.data?.message || error.message
         };
     }
 };
 
 export const checkoutOrder = async (orderData) => {
     try {
-        console.log('Placing cart order:', orderData);
+        const response = await axiosInstance.post('/order/cartItem', orderData);
 
-        const response = await fetch(`${ORDER_API}/cartItem`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        console.log('Cart order response status:', response.status);
-        console.log('Cart order response headers:', response.headers);
-
-        // Check if response is empty
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            if (response.ok) {
-                // Empty response but successful
-                console.log('Empty but successful response for cart order');
-                return {
-                    success: true,
-                    status: response.status,
-                    message: 'Order placed successfully'
-                };
-            } else {
-                // Error with no JSON body
-                const errorText = await response.text();
-                console.log('Error response text:', errorText);
-                throw new Error(`Cart order failed (Status: ${response.status}): ${errorText || 'No details'}`);
-            }
+        // For empty responses
+        if (response.status === 204 || response.data === '') {
+            return {
+                success: true,
+                status: response.status,
+                message: 'Order placed successfully'
+            };
         }
 
-        const data = await response.json();
-        console.log('Cart order response data:', data);
-
-        if (!response.ok) {
-            throw new Error(`Cart order failed: ${data.message || `Status: ${response.status}`}`);
-        }
-
-        return { success: true, data: data, status: response.status };
-
+        return { success: true, data: response.data, status: response.status };
     } catch (error) {
         console.error('Cart Order API Error:', error);
         return {
             success: false,
-            error: error.message,
+            error: error.response?.data?.message || error.message,
             rawError: error
         };
     }

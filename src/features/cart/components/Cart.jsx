@@ -13,11 +13,6 @@ function Cart() {
     const [selectedItems, setSelectedItems] = useState(new Set());
 
     useEffect(() => {
-        if (!user) {
-            navigate("/login");
-            return;
-        }
-
         const load = async () => {
             setLoading(true);
             await fetchCart(user.id);
@@ -25,7 +20,7 @@ function Cart() {
         };
 
         load();
-    }, [user, navigate]);
+    }, [user]);
 
     // Handle Selection
     const toggleSelection = (productId) => {

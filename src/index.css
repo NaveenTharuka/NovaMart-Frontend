@@ -1,45 +1,6 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
 
-
-/* Footer styles */
-.footer {
-    background: #111827;
-    /* bg-gray-900 */
-    color: white;
-    padding: 2rem 0;
-    /* py-8 */
-}
-
-.footer-content {
-    max-width: 80rem;
-    /* max-w-7xl */
-    margin: 0 auto;
-    padding: 0 1rem;
-    /* px-4 */
-    text-align: center;
-}
-
-.footer-title {
-    font-size: 1.125rem;
-    /* text-lg */
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    /* mb-2 */
-}
-
-.footer-text {
-    color: #9ca3af;
-    /* text-gray-400 */
-}
-
-.main-content {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-
-
 /* body {
     background-image: linear-gradient(to right, #CBCBCB, #FFFFE3);
 } */

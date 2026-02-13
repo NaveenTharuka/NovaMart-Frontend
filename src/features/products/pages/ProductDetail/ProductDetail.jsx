@@ -317,9 +317,9 @@ function ProductDetail() {
         );
     };
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!user) return navigate("/login");
-        const res = addToCart(user.id, id, quantity, navigate);
+        const res = await addToCart(user.id, id, quantity);
         if (res.success) alert("Product added to cart successfully!");
     };
 

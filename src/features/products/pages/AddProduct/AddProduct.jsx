@@ -1,126 +1,215 @@
 import { useEffect, useState } from 'react';
 import { addProduct } from '@/api/product.api';
-import './AddProduct.module.css';
+import styles from './AddProduct.module.css';
 import { fetchCategories } from '@/api/category.api';
 
 function AddProduct() {
     const [categories, setCategories] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
+    const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
     useEffect(() => {
-
-        const data = fetchCategories();
-        setCategories(data);
-
+        async function loadCategories() {
+            try {
+                setIsLoadingCategories(true);
+                const result = await fetchCategories();
+                if (result.success) {
+                    setCategories(result.data);
+                } else {
+                    console.error('Failed to fetch categories:', result.error);
+                    setSubmitStatus({ type: 'error', message: 'Failed to load categories. Please refresh the page.' });
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                setSubmitStatus({ type: 'error', message: 'Error loading categories' });
+            } finally {
+                setIsLoadingCategories(false);
+            }
+        }
+        loadCategories();
     }, []);
 
     const [product, setProduct] = useState({
         name: '',
         description: '',
-        price: 0,
-        quantity: 0,
-        category: '' // category name as string
+        price: '',
+        quantity: '',
+        category: ''
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setProduct(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    }
+        setProduct(prev => ({ ...prev, [name]: value }));
+        if (submitStatus.message) setSubmitStatus({ type: '', message: '' });
+    };
 
     async function handleSubmit(e) {
         e.preventDefault();
+        setIsLoading(true);
+        setSubmitStatus({ type: '', message: '' });
 
-        addProduct(product);
-        alert("Product added successfully!");
+        try {
+            const productToSubmit = {
+                ...product,
+                price: parseFloat(product.price),
+                quantity: parseInt(product.quantity, 10)
+            };
 
-        // Reset form
-        setProduct({
-            name: '',
-            description: '',
-            price: '',
-            quantity: 0,
-            category: ''
-        });
+            if (isNaN(productToSubmit.price) || productToSubmit.price <= 0) {
+                setSubmitStatus({ type: 'error', message: 'Please enter a valid price (greater than 0)' });
+                setIsLoading(false);
+                return;
+            }
 
+            if (isNaN(productToSubmit.quantity) || productToSubmit.quantity < 0) {
+                setSubmitStatus({ type: 'error', message: 'Please enter a valid quantity (0 or greater)' });
+                setIsLoading(false);
+                return;
+            }
+
+            if (!productToSubmit.category) {
+                setSubmitStatus({ type: 'error', message: 'Please select a category' });
+                setIsLoading(false);
+                return;
+            }
+
+            const result = await addProduct(productToSubmit);
+
+            if (result.success) {
+                setSubmitStatus({ type: 'success', message: 'Product added successfully!' });
+                setProduct({ name: '', description: '', price: '', quantity: '', category: '' });
+            } else {
+                setSubmitStatus({ type: 'error', message: result.error || 'Failed to add product.' });
+            }
+
+            setTimeout(() => setSubmitStatus({ type: '', message: '' }), 5000);
+
+        } catch (error) {
+            console.error('Error adding product:', error);
+            setSubmitStatus({ type: 'error', message: error.message || 'Failed to add product. Please try again.' });
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
-        <>
-            <div>
-                <h1 className='add-product-title'>Add New Product</h1>
-            </div>
-
-            <div className='flex justify-center'>
-                <div className='detail-container'>
+        <div className={styles.wrapper}>
+            <div><h1 className={styles.title}>Add New Product</h1></div>
+            <div className={`${styles.flex} ${styles.justifyCenter}`}>
+                <div className={styles.container}>
+                    {submitStatus.message && (
+                        <div className={submitStatus.type === 'success' ? styles.successMessage : styles.errorMessage}>
+                            {submitStatus.message}
+                        </div>
+                    )}
                     <form onSubmit={handleSubmit}>
-                        <h1>Product Name</h1>
-                        <input
-                            type='text'
-                            placeholder='Enter product name'
-                            name='name'
-                            value={product.name}
-                            onChange={handleChange}
-                            required
-                        /><br /><br />
-
-                        <h1>Product Description</h1>
-                        <textarea
-                            placeholder='Enter product description'
-                            name='description'
-                            value={product.description}
-                            onChange={handleChange}
-                            required
-                        ></textarea><br /><br />
-
-                        <h1>Product Price</h1>
-                        <input
-                            type='number'
-                            name='price'
-                            value={product.price}
-                            min='0'
-                            step='0.01'
-                            placeholder='Enter product price'
-                            onChange={handleChange}
-                            required
-                        /><br /><br />
-
-                        <h1>Product Quantity</h1>
-                        <input
-                            type='number'
-                            min='0'
-                            name='quantity'
-                            value={product.quantity}
-                            placeholder='Enter product quantity'
-                            onChange={handleChange}
-                            required
-                        /><br /><br />
-
-                        <div className="form-group">
-                            <h1>Product Category</h1>
-                            <div className="category-wrapper">
-                                <select
-                                    name='category'
-                                    value={product.category}
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>
+                                <span className={styles.heading}>Product Name</span>
+                                <input
+                                    type='text'
+                                    placeholder='Enter product name'
+                                    name='name'
+                                    value={product.name}
                                     onChange={handleChange}
                                     required
-                                >
-                                    <option value="">Select a category</option>
-                                    {categories.map(category => (
-                                        <option key={category.id || category.name} value={category.name}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    disabled={isLoading}
+                                    className={styles.input}
+                                />
+                            </label>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>
+                                <span className={styles.heading}>Product Description</span>
+                                <textarea
+                                    placeholder='Enter product description'
+                                    name='description'
+                                    value={product.description}
+                                    onChange={handleChange}
+                                    required
+                                    disabled={isLoading}
+                                    className={styles.textarea}
+                                />
+                            </label>
+                        </div>
+
+                        <div className={styles.formGrid}>
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>
+                                    <span className={styles.heading}>Product Price</span>
+                                    <input
+                                        type='number'
+                                        name='price'
+                                        value={product.price}
+                                        min='0'
+                                        step='0.01'
+                                        placeholder='Enter product price'
+                                        onChange={handleChange}
+                                        required
+                                        disabled={isLoading}
+                                        className={styles.input}
+                                    />
+                                </label>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                                <label className={styles.label}>
+                                    <span className={styles.heading}>Product Quantity</span>
+                                    <input
+                                        type='number'
+                                        min='0'
+                                        name='quantity'
+                                        value={product.quantity}
+                                        placeholder='Enter product quantity'
+                                        onChange={handleChange}
+                                        required
+                                        disabled={isLoading}
+                                        className={styles.input}
+                                    />
+                                </label>
                             </div>
                         </div>
 
-                        <button type='submit' className='submit-btn'>Submit</button>
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>
+                                <span className={styles.heading}>Product Category</span>
+                                <div className={styles.categoryWrapper}>
+                                    <select
+                                        name='category'
+                                        value={product.category}
+                                        onChange={handleChange}
+                                        required
+                                        disabled={isLoading || isLoadingCategories}
+                                        className={`${styles.select} ${isLoadingCategories ? styles.selectLoading : ''}`}
+                                    >
+                                        <option value="">Select a category</option>
+                                        {isLoadingCategories ? (
+                                            <option value="" disabled>Loading categories...</option>
+                                        ) : (
+                                            categories.map(category => (
+                                                <option key={category.id || category.name} value={category.name}>
+                                                    {category.name}
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
+                                </div>
+                            </label>
+                        </div>
+
+                        <button
+                            type='submit'
+                            className={`${styles.submitBtn} ${isLoading ? styles.submitBtnLoading : ''}`}
+                            disabled={isLoading || isLoadingCategories}
+                        >
+                            {isLoading ? 'Adding Product...' : 'Submit'}
+                        </button>
                     </form>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 

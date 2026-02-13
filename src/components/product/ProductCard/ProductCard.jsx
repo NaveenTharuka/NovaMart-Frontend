@@ -35,13 +35,26 @@ function ProductCard({ product }) {
     const hasRating = safeRating > 0;
     const hasReviews = reviewCount > 0;
 
-    const handleAddToCart = (e) => {
+    const handleAddToCart = async (e) => {
         e.stopPropagation();
         if (quantity === 0) return;
 
-        addToCart(user.id, id, 1);
-        setShowNotification(true);
-        setTimeout(() => setShowNotification(false), 3000);
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+
+        try {
+            const res = await addToCart(user.id, id, 1);
+            if (res.success) {
+                setShowNotification(true);
+                setTimeout(() => setShowNotification(false), 3000);
+            } else {
+                console.error("Add to cart failed:", res.error);
+            }
+        } catch (error) {
+            console.error("Add to cart error:", error);
+        }
     };
 
     const handleCardClick = () => {

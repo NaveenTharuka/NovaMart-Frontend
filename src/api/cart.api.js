@@ -1,65 +1,50 @@
-import { BASE_URL } from "@/api/axios";
-
-export const CART_API = `${BASE_URL}/api/cart`;
+// src/api/cart.api.js
+import axiosInstance from './axiosInstance';
 
 export const getCart = async (userId) => {
     try {
-        const res = await fetch(`${CART_API}/${userId}`);
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data?.message || "Failed to get cart");
-
-        return { success: true, data };
-    } catch (err) {
-        return { success: false, error: err.message };
+        const response = await axiosInstance.get(`/cart/${userId}`);
+        return { success: true, data: response.data };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message
+        };
     }
 };
 
 export const addToCart = async (userId, productId, quantity = 1) => {
     try {
-        const res = await fetch(`${CART_API}/${userId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productId, quantity }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.message || "Failed to add to cart");
-
-        return { success: true, data };
-    } catch (err) {
-        return { success: false, error: err.message };
+        const response = await axiosInstance.post(`/cart/${userId}`, { productId, quantity });
+        return { success: true, data: response.data };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message
+        };
     }
 };
 
 export const removeFromCartAPI = async (userId, productId) => {
     try {
-        const res = await fetch(`${CART_API}/${userId}/${productId}`, {
-            method: "DELETE",
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.message || "Failed to remove item");
-
-        return { success: true, data };
-    } catch (err) {
-        return { success: false, error: err.message };
+        const response = await axiosInstance.delete(`/cart/${userId}`, { data: { productId } });
+        return { success: true, data: response.data };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message
+        };
     }
 };
 
 export const updateCartItemAPI = async (userId, productId, quantity) => {
     try {
-        const res = await fetch(`${CART_API}/${userId}/${productId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ quantity }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.message || "Failed to update item");
-
-        return { success: true, data };
-    } catch (err) {
-        return { success: false, error: err.message };
+        const response = await axiosInstance.put(`/cart/${userId}`, { productId, quantity });
+        return { success: true, data: response.data };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.response?.data?.message || error.message
+        };
     }
 };

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { BASE_URL } from "@/api/axios";
+import { getCart, removeFromCartAPI, updateCartItemAPI } from "@/api/cart.api";
 
 const CartContext = createContext();
 
@@ -7,17 +7,16 @@ export const CartProvider = ({ children }) => {
     const [cart, setCart] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const CART_API = `${BASE_URL}/api/cart`;
-
     const fetchCart = async (userId) => {
         try {
             setLoading(true);
-            const res = await fetch(`${CART_API}/${userId}`);
+            const res = await getCart(userId);
 
-            if (!res.ok) throw new Error("Failed to fetch cart");
-
-            const data = await res.json();
-            setCart(data);
+            if (res.success) {
+                setCart(res.data);
+            } else {
+                throw new Error(res.error || "Failed to fetch cart");
+            }
         } catch (err) {
             console.error("Fetch cart error:", err);
         } finally {
@@ -26,39 +25,38 @@ export const CartProvider = ({ children }) => {
     };
 
     const updateQuantity = async (productId, quantity, userId) => {
+        // console.log(`[CartContext] Updating: user=${userId}, product=${productId}, qty=${quantity}`);
         try {
-            const res = await fetch(`${CART_API}/${userId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId, quantity }),
-            });
+            if (!userId) {
+                console.error("[CartContext] updateQuantity aborted: userId is missing");
+                return;
+            }
+            const res = await updateCartItemAPI(userId, productId, quantity);
 
-            if (!res.ok) throw new Error("Failed to update quantity");
-
-            setCart((prev) =>
-                prev.map((item) =>
-                    item.productId === productId
-                        ? { ...item, quantity, subTotal: (item.subTotal / item.quantity) * quantity }
-                        : item
-                )
-            );
+            if (res.success) {
+                setCart(res.data);
+            } else {
+                throw new Error(res.error || "Failed to update quantity");
+            }
         } catch (err) {
             console.error("Update quantity error:", err);
         }
     };
 
     const removeItem = async (productId, userId) => {
+        // console.log(`[CartContext] Removing: user=${userId}, product=${productId}`);
         try {
-            const res = await fetch(`${CART_API}/${userId}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ productId })
-            });
+            if (!userId) {
+                console.error("[CartContext] removeItem aborted: userId is missing");
+                return;
+            }
+            const res = await removeFromCartAPI(userId, productId);
 
-
-            if (!res.ok) throw new Error("Failed to remove item");
-
-            setCart((prev) => prev.filter((item) => item.productId !== productId));
+            if (res.success) {
+                setCart(res.data);
+            } else {
+                throw new Error(res.error || "Failed to remove item");
+            }
         } catch (err) {
             console.error("Remove item error:", err);
         }
