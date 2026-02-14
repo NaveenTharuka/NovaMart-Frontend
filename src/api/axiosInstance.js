@@ -25,8 +25,6 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             console.warn('[Axios] 401 Unauthorized', error.config?.url);
-            localStorage.removeItem('token');
-            sessionStorage.removeItem('token');
             alert('Session expired. Please log in again.');
             // AuthContext / ProtectedRoute will handle actual redirect
         }

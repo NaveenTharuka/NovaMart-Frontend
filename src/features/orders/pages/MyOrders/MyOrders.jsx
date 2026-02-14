@@ -285,7 +285,7 @@ function MyOrders() {
                     <div className={styles.noOrdersIcon}>📦</div>
                     <h2>No Orders Yet</h2>
                     <p>Start shopping to see your orders here!</p>
-                    <button className={styles.shopNowBtn}>
+                    <button className={styles.shopNowBtn} onClick={() => navigate('/products')}>
                         Start Shopping
                     </button>
                 </div>

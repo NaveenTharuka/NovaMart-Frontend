@@ -8,6 +8,7 @@
     grid-template-columns: 1fr 350px;
     gap: 2rem;
     min-height: 60vh;
+
 }
 
 .cartList {
@@ -46,6 +47,7 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     align-items: center;
     transition: transform 0.2s, box-shadow 0.2s;
+
 }
 
 .cartItemCard:hover {
@@ -196,6 +198,10 @@
     top: 2rem;
 }
 
+.summeryHidden {
+    display: none;
+}
+
 .summaryTitle {
     font-size: 1.5rem;
     font-weight: 700;
@@ -254,6 +260,7 @@
     grid-column: 1 / -1;
     background: white;
     border-radius: 12px;
+    box-shadow: 0 4px 6px 1px rgba(0, 0, 0, 0.1);
 }
 
 .browseBtn {
@@ -264,11 +271,12 @@
     color: white;
     text-decoration: none;
     border-radius: 6px;
-    transition: opacity 0.2s;
+    transition: all 0.3s ease;
 }
 
 .browseBtn:hover {
     opacity: 0.9;
+    scale: 1.2;
 }
 
 /* Responsive */

@@ -1,23 +1,19 @@
 import Loader from '@/components/Loader/Loader';
 import styles from './UpdateProduct.module.css';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { fetchProductById, updateProduct } from '../../../../api/product.api';
+import { fetchCategories } from '../../../../api/category.api';
 
 function UpdateProduct() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [categories, setCategories] = useState([]);
-
-    // Fixed: Added empty dependency array to prevent infinite loop
-    useEffect(() => {
-        fetch("http://localhost:8080/api/categories")
-            .then(res => res.json())
-            .then(data => setCategories(data))
-            .catch((e) => console.log(e));
-    }, []); // Added empty dependency array
+    const [categoriesLoading, setCategoriesLoading] = useState(true);
 
     const [updatedProduct, setUpdatedProduct] = useState({
         id: '',
@@ -25,22 +21,51 @@ function UpdateProduct() {
         description: '',
         price: '',
         quantity: 0,
-        category: ''
+        category: '',
+        imageUrl: ''
     });
 
-    // Fixed: Removed duplicate fetch call and fixed conditional logic
+    // Fetch categories
+    useEffect(() => {
+        const fetchCategory = async () => {
+            try {
+                setCategoriesLoading(true);
+                const data = await fetchCategories();
+                // Ensure data is an array
+                if (Array.isArray(data)) {
+                    setCategories(data);
+                } else if (data && typeof data === 'object') {
+                    // If data is an object with a results/data property, extract it
+                    const categoriesArray = data.categories || data.data || data.results || [];
+                    setCategories(Array.isArray(categoriesArray) ? categoriesArray : []);
+                } else {
+                    console.error('Categories data is not an array:', data);
+                    setCategories([]);
+                    setError('Invalid category data format');
+                }
+            } catch (err) {
+                console.error('Error fetching categories:', err);
+                setCategories([]);
+                setError('Failed to load category data. Please try again.');
+            } finally {
+                setCategoriesLoading(false);
+            }
+        };
+        fetchCategory();
+    }, []);
+
+    // Fetch product data
     useEffect(() => {
         const fetchProduct = async () => {
+            if (!id) {
+                setError('No product ID provided');
+                setLoading(false);
+                return;
+            }
+
             try {
                 setLoading(true);
-
-                const response = await fetch(`http://localhost:8080/api/products/id/${id}`);
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch product: ${response.status}`);
-                }
-
-                const data = await response.json();
+                const data = await fetchProductById(id);
                 setUpdatedProduct(data);
                 setError(null);
             } catch (err) {
@@ -51,14 +76,8 @@ function UpdateProduct() {
             }
         };
 
-        // Fixed: Check id before fetching
-        if (id) {
-            fetchProduct();
-        } else {
-            setError('No product ID provided');
-            setLoading(false);
-        }
-    }, [id]); // Added id as dependency
+        fetchProduct();
+    }, [id]);
 
     const handleChange = (e) => {
         const { name, value, type } = e.target;
@@ -73,40 +92,48 @@ function UpdateProduct() {
         e.preventDefault();
         setIsSubmitting(true);
         setError(null);
-        setSuccess(false); // Reset success state
+        setSuccess(false);
+
 
         try {
-            const response = await fetch(`http://localhost:8080/api/products`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedProduct)
-            });
+            // Prepare data in the format your backend expects
+            const productUpdateReqDto = {
+                id: updatedProduct.id,
+                name: updatedProduct.name,
+                description: updatedProduct.description,
+                price: parseFloat(updatedProduct.price),
+                quantity: parseInt(updatedProduct.quantity),
+                category: updatedProduct.category // Send category name, not ID
+            };
 
-            if (!response.ok) {
-                throw new Error(`Failed to update product: ${response.status}`);
-            }
+
+
+            // Call updateProduct with both parameters (product ID and the DTO)
+            const response = await updateProduct(productUpdateReqDto);
 
             setSuccess(true);
-            window.alert('Product updated successfully!');
+            setTimeout(() => {
+                navigate('/products');
+            }, 2000);
 
         } catch (err) {
             console.error('Error updating product:', err);
-            setError('Failed to update product. Please try again.');
+            setError(err.message || 'Failed to update product. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleCancel = () => {
-        window.history.back();
+        navigate(-1);
     };
 
-    if (loading) {
+    if (loading || categoriesLoading) {
         return (
             <div className={styles.updateProductContainer}>
-                <div className={styles.loading}><Loader />.</div>
+                <div className={styles.loading}>
+                    <Loader />
+                </div>
             </div>
         );
     }
@@ -115,7 +142,7 @@ function UpdateProduct() {
         return (
             <div className={styles.updateProductContainer}>
                 <div className={styles.errorMessage}>{error}</div>
-                <button onClick={() => window.location.href = '/'} className={styles.backBtn}>
+                <button onClick={() => navigate('/')} className={styles.backBtn}>
                     Go to Home
                 </button>
             </div>
@@ -127,7 +154,11 @@ function UpdateProduct() {
             <h2>Update Product</h2>
 
             {error && <div className={styles.errorMessage}>{error}</div>}
-            {success && <div className={styles.successMessage}>Product updated successfully!</div>}
+            {success && (
+                <div className={styles.successMessage}>
+                    Product updated successfully! Redirecting...
+                </div>
+            )}
 
             <div className={styles.contentLayout}>
                 {/* Left Column: Form */}
@@ -151,7 +182,7 @@ function UpdateProduct() {
                                 type="text"
                                 id="name"
                                 name="name"
-                                value={updatedProduct.name}
+                                value={updatedProduct.name || ''}
                                 onChange={handleChange}
                                 required
                                 disabled={isSubmitting}
@@ -177,7 +208,7 @@ function UpdateProduct() {
                             <textarea
                                 id="description"
                                 name="description"
-                                value={updatedProduct.description}
+                                value={updatedProduct.description || ''}
                                 onChange={handleChange}
                                 rows="4"
                                 disabled={isSubmitting}
@@ -191,7 +222,7 @@ function UpdateProduct() {
                                     type="number"
                                     id="price"
                                     name="price"
-                                    value={updatedProduct.price}
+                                    value={updatedProduct.price || ''}
                                     onChange={handleChange}
                                     min="0"
                                     step="0.01"
@@ -206,7 +237,7 @@ function UpdateProduct() {
                                     type="number"
                                     id="quantity"
                                     name="quantity"
-                                    value={updatedProduct.quantity}
+                                    value={updatedProduct.quantity || 0}
                                     onChange={handleChange}
                                     min="0"
                                     required
@@ -226,11 +257,18 @@ function UpdateProduct() {
                                 disabled={isSubmitting}
                             >
                                 <option value="">Select a category</option>
-                                {categories.map(category => (
-                                    <option key={category.id || category.name} value={category.name} className={styles.dropdown}>
-                                        {category.name}
-                                    </option>
-                                ))}
+                                {Array.isArray(categories) && categories.length > 0 ? (
+                                    categories.map(category => (
+                                        <option
+                                            key={category.id}
+                                            value={category.name}
+                                        >
+                                            {category.name}
+                                        </option>
+                                    ))
+                                ) : (
+                                    <option value="" disabled>No categories available</option>
+                                )}
                             </select>
                         </div>
 
@@ -246,7 +284,7 @@ function UpdateProduct() {
                             <button
                                 type="submit"
                                 className={styles.submitBtn}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || success}
                             >
                                 {isSubmitting ? 'Updating...' : 'Update Product'}
                             </button>
@@ -263,15 +301,22 @@ function UpdateProduct() {
                                 src={updatedProduct.imageUrl || "https://picsum.photos/300/200"}
                                 alt="Product Preview"
                                 className={styles.previewImage}
-                                onError={(e) => (e.target.src = "https://via.placeholder.com/300x200?text=Error+Loading+Image")}
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "https://via.placeholder.com/300x200?text=Error+Loading+Image";
+                                }}
                             />
                             {updatedProduct.quantity === 0 && (
                                 <div className={styles.outOfStockBadge}>Out of Stock</div>
                             )}
                         </div>
                         <div className={styles.previewContent}>
-                            <div className={styles.previewCategory}>{updatedProduct.category || "Category"}</div>
-                            <h4 className={styles.previewName}>{updatedProduct.name || "Product Name"}</h4>
+                            <div className={styles.previewCategory}>
+                                {updatedProduct.category || "Category"}
+                            </div>
+                            <h4 className={styles.previewName}>
+                                {updatedProduct.name || "Product Name"}
+                            </h4>
                             <p className={styles.previewDescription}>
                                 {updatedProduct.description
                                     ? (updatedProduct.description.length > 80
@@ -280,7 +325,9 @@ function UpdateProduct() {
                                     : "Product description will appear here..."}
                             </p>
                             <div className={styles.previewFooter}>
-                                <div className={styles.previewPrice}>Rs {Number(updatedProduct.price).toFixed(2)}</div>
+                                <div className={styles.previewPrice}>
+                                    Rs {Number(updatedProduct.price || 0).toFixed(2)}
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -50,7 +50,7 @@ export const addProduct = async (product) => {
 
 export const updateProduct = async (product) => {
     try {
-        const response = await axiosInstance.put(`/products/id/${product.id}`, product);
+        const response = await axiosInstance.put(`/products/update`, product);
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.message || error.message };
