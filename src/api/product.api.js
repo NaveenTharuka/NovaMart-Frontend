@@ -1,9 +1,10 @@
 // src/api/product.api.js
 import axiosInstance from './axiosInstance';
+import publicAxios from './publicAxios';
 
 export const getAllProducts = async () => {
     try {
-        const response = await axiosInstance.get('/products/all');
+        const response = await publicAxios.get('/products/all');
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.message || error.message };
@@ -21,7 +22,7 @@ export const fetchProductByOrderItemId = async (orderItemId) => {
 
 export const fetchProductById = async (id) => {
     try {
-        const response = await axiosInstance.get(`/products/id/${id}`);
+        const response = await publicAxios.get(`/products/id/${id}`);
         const data = response.data;
         return {
             id: data.id,

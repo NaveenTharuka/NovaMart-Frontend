@@ -25,8 +25,13 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             console.warn('[Axios] 401 Unauthorized', error.config?.url);
-            alert('Session expired. Please log in again.');
-            // AuthContext / ProtectedRoute will handle actual redirect
+            const token = localStorage.getItem('token');
+            if (token) {
+                alert('Session expired. Please log in again.');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }

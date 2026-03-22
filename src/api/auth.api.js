@@ -1,5 +1,6 @@
 // src/api/auth.api.js
 import axiosInstance from './axiosInstance';
+import publicAxios from './publicAxios';
 
 export const login = async ({ email, password }) => {
     try {
@@ -29,7 +30,7 @@ export const register = async ({ email, password, userName, address, phoneNumber
 
 export const verifyToken = async (token) => {
     try {
-        const response = await axiosInstance.post('/user/isTokenExpired', { token });
+        const response = await publicAxios.post('/user/isTokenExpired', { token });
         return { success: !response.data };
     } catch {
         return { success: false };

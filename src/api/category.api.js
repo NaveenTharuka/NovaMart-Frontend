@@ -1,9 +1,9 @@
 // src/api/category.api.js
-import axiosInstance from './axiosInstance';
+import publicAxios from './publicAxios';
 
 export const fetchCategories = async () => {
     try {
-        const response = await axiosInstance.get('/categories/all');
+        const response = await publicAxios.get('/categories/all');
         return { success: true, data: response.data };
     } catch (error) {
         console.error("Fetching error: Categories", error);
