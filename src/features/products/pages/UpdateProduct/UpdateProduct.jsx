@@ -24,7 +24,7 @@ function UpdateProduct() {
         price: '',
         quantity: 0,
         category: '',
-        productImageUrl: ''
+        imageUrl: ''
     });
 
     // Fetch categories
@@ -122,14 +122,14 @@ function UpdateProduct() {
         const { name, value, type } = e.target;
 
         // Reset image error when URL changes
-        if (name === 'imageUrl' || name === 'productImageUrl') {
+        if (name === 'imageUrl') {
             setImageError(false);
         }
 
         setHasUnsavedChanges(true);
         setUpdatedProduct(prev => ({
             ...prev,
-            [name === 'imageUrl' ? 'productImageUrl' : name]: type === 'number' ? parseFloat(value) || 0 : value
+            [name]: type === 'number' ? parseFloat(value) || 0 : value
         }));
     };
 
@@ -153,15 +153,11 @@ function UpdateProduct() {
                 price: parseFloat(updatedProduct.price),
                 quantity: parseInt(updatedProduct.quantity),
                 category: updatedProduct.category,
-                productImageUrl: updatedProduct.productImageUrl?.trim() || ''
+                productImageUrl: updatedProduct.imageUrl?.trim() || ''
             };
 
-            // Call updateProduct - adjust based on your API function signature
-            // Option 1: If updateProduct expects (id, data)
-            const response = await updateProduct(updatedProduct.id, productUpdateReqDto);
-
-            // Option 2: If updateProduct expects just the data object with id
-            // const response = await updateProduct(productUpdateReqDto);
+            // Call updateProduct
+            const response = await updateProduct(productUpdateReqDto);
 
             setSuccess(true);
             setHasUnsavedChanges(false);
@@ -252,7 +248,7 @@ function UpdateProduct() {
                                 type="url"
                                 id="imageUrl"
                                 name="imageUrl"
-                                value={updatedProduct.productImageUrl || ''}
+                                value={updatedProduct.imageUrl || ''}
                                 onChange={handleChange}
                                 placeholder="https://example.com/image.jpg"
                                 disabled={isSubmitting || success}
@@ -357,7 +353,7 @@ function UpdateProduct() {
                     <div className={styles.previewCard}>
                         <div className={styles.previewImageContainer}>
                             <img
-                                src={imageError ? "https://picsum.photos/300/200" : (updatedProduct.productImageUrl || "https://picsum.photos/300/200")}
+                                src={imageError ? "https://picsum.photos/300/200" : (updatedProduct.imageUrl || "https://picsum.photos/300/200")}
                                 alt={updatedProduct.name || "Product Preview"}
                                 className={styles.previewImage}
                                 onError={() => setImageError(true)}
