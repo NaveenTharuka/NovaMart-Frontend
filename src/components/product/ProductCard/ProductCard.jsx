@@ -19,13 +19,11 @@ function ProductCard({ product }) {
         price = 0,
         category = "Uncategorized",
         quantity = 0,
-        imageUrl,
         rating = 0,
         reviews = [], // Changed from 0 to [] - reviews is an array
         originalPrice
     } = product;
 
-    const displayImage = imageUrl || "https://picsum.photos/300/200";
     const displayPrice = typeof price === 'number' ? price.toFixed(2) : price;
 
     // Safely handle rating display
@@ -117,7 +115,7 @@ function ProductCard({ product }) {
                 {/* Image Section */}
                 <div className={`${styles.imageContainer} ${imageLoaded ? styles.loaded : ''}`}>
                     <img
-                        src={displayImage}
+                        src={product.imgUrl}
                         alt={name}
                         className={styles.productImage}
                         loading="lazy"

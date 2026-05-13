@@ -35,7 +35,8 @@ function AddProduct() {
         description: '',
         price: '',
         quantity: '',
-        category: ''
+        category: '',
+        imgUrl: ''
     });
 
     const handleChange = (e) => {
@@ -196,6 +197,22 @@ function AddProduct() {
                                         )}
                                     </select>
                                 </div>
+                            </label>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label className={styles.label}>
+                                <span className={styles.heading}>Product Image URL</span>
+                                <input
+                                    type='text'
+                                    name='imgUrl'
+                                    value={product.imgUrl}
+                                    placeholder='Enter product image URL'
+                                    onChange={handleChange}
+                                    required
+                                    disabled={isLoading}
+                                    className={styles.input}
+                                />
                             </label>
                         </div>
 

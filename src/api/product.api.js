@@ -29,7 +29,7 @@ export const fetchProductById = async (id) => {
             name: data.name,
             description: data.description,
             price: parseFloat(data.price),
-            imageUrl: data.imageUrl,
+            imageUrl: data.imgUrl,
             category: data.category || '',
             quantity: data.quantity,
             rating: data.rating || 0,

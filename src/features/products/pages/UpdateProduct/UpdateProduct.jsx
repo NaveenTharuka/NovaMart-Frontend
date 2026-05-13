@@ -14,6 +14,8 @@ function UpdateProduct() {
     const [success, setSuccess] = useState(false);
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(true);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
     const [updatedProduct, setUpdatedProduct] = useState({
         id: '',
@@ -22,7 +24,7 @@ function UpdateProduct() {
         price: '',
         quantity: 0,
         category: '',
-        imageUrl: ''
+        productImageUrl: ''
     });
 
     // Fetch categories
@@ -31,22 +33,13 @@ function UpdateProduct() {
             try {
                 setCategoriesLoading(true);
                 const data = await fetchCategories();
-                // Ensure data is an array
-                if (Array.isArray(data)) {
-                    setCategories(data);
-                } else if (data && typeof data === 'object') {
-                    // If data is an object with a results/data property, extract it
-                    const categoriesArray = data.categories || data.data || data.results || [];
-                    setCategories(Array.isArray(categoriesArray) ? categoriesArray : []);
-                } else {
-                    console.error('Categories data is not an array:', data);
-                    setCategories([]);
-                    setError('Invalid category data format');
-                }
+                // Handle different response formats
+                const categoriesArray = data?.categories || data?.data || data?.results || data || [];
+                setCategories(Array.isArray(categoriesArray) ? categoriesArray : []);
             } catch (err) {
                 console.error('Error fetching categories:', err);
                 setCategories([]);
-                setError('Failed to load category data. Please try again.');
+                setError('Failed to load category data');
             } finally {
                 setCategoriesLoading(false);
             }
@@ -66,11 +59,14 @@ function UpdateProduct() {
             try {
                 setLoading(true);
                 const data = await fetchProductById(id);
+                if (!data) {
+                    throw new Error('Product not found');
+                }
                 setUpdatedProduct(data);
                 setError(null);
             } catch (err) {
                 console.error('Error fetching product:', err);
-                setError('Failed to load product data. Please try again.');
+                setError(err.message || 'Failed to load product data');
             } finally {
                 setLoading(false);
             }
@@ -79,43 +75,96 @@ function UpdateProduct() {
         fetchProduct();
     }, [id]);
 
+    // Warn about unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [hasUnsavedChanges]);
+
+    // Auto-dismiss success message and redirect
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => {
+                navigate('/products');
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [success, navigate]);
+
+    const validateForm = () => {
+        if (!updatedProduct.name?.trim()) {
+            setError('Product name is required');
+            return false;
+        }
+        if (!updatedProduct.price || updatedProduct.price <= 0) {
+            setError('Valid price is required');
+            return false;
+        }
+        if (!updatedProduct.category) {
+            setError('Please select a category');
+            return false;
+        }
+        if (updatedProduct.quantity < 0) {
+            setError('Quantity cannot be negative');
+            return false;
+        }
+        return true;
+    };
+
     const handleChange = (e) => {
         const { name, value, type } = e.target;
 
+        // Reset image error when URL changes
+        if (name === 'imageUrl' || name === 'productImageUrl') {
+            setImageError(false);
+        }
+
+        setHasUnsavedChanges(true);
         setUpdatedProduct(prev => ({
             ...prev,
-            [name]: type === 'number' ? parseFloat(value) || 0 : value
+            [name === 'imageUrl' ? 'productImageUrl' : name]: type === 'number' ? parseFloat(value) || 0 : value
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
         setIsSubmitting(true);
         setError(null);
         setSuccess(false);
-
 
         try {
             // Prepare data in the format your backend expects
             const productUpdateReqDto = {
                 id: updatedProduct.id,
-                name: updatedProduct.name,
-                description: updatedProduct.description,
+                name: updatedProduct.name.trim(),
+                description: updatedProduct.description?.trim() || '',
                 price: parseFloat(updatedProduct.price),
                 quantity: parseInt(updatedProduct.quantity),
-                category: updatedProduct.category // Send category name, not ID
+                category: updatedProduct.category,
+                productImageUrl: updatedProduct.productImageUrl?.trim() || ''
             };
 
+            // Call updateProduct - adjust based on your API function signature
+            // Option 1: If updateProduct expects (id, data)
+            const response = await updateProduct(updatedProduct.id, productUpdateReqDto);
 
-
-            // Call updateProduct with both parameters (product ID and the DTO)
-            const response = await updateProduct(productUpdateReqDto);
+            // Option 2: If updateProduct expects just the data object with id
+            // const response = await updateProduct(productUpdateReqDto);
 
             setSuccess(true);
-            setTimeout(() => {
-                navigate('/products');
-            }, 2000);
-
+            setHasUnsavedChanges(false);
         } catch (err) {
             console.error('Error updating product:', err);
             setError(err.message || 'Failed to update product. Please try again.');
@@ -125,7 +174,13 @@ function UpdateProduct() {
     };
 
     const handleCancel = () => {
-        navigate(-1);
+        if (hasUnsavedChanges) {
+            if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+                navigate(-1);
+            }
+        } else {
+            navigate(-1);
+        }
     };
 
     if (loading || categoriesLoading) {
@@ -177,7 +232,7 @@ function UpdateProduct() {
                         </div>
 
                         <div className={styles.formRow}>
-                            <label htmlFor="name">Product Name</label>
+                            <label htmlFor="name">Product Name *</label>
                             <input
                                 type="text"
                                 id="name"
@@ -185,7 +240,8 @@ function UpdateProduct() {
                                 value={updatedProduct.name || ''}
                                 onChange={handleChange}
                                 required
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || success}
+                                placeholder="Enter product name"
                             />
                         </div>
 
@@ -196,10 +252,10 @@ function UpdateProduct() {
                                 type="url"
                                 id="imageUrl"
                                 name="imageUrl"
-                                value={updatedProduct.imageUrl || ''}
+                                value={updatedProduct.productImageUrl || ''}
                                 onChange={handleChange}
                                 placeholder="https://example.com/image.jpg"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || success}
                             />
                         </div>
 
@@ -211,13 +267,14 @@ function UpdateProduct() {
                                 value={updatedProduct.description || ''}
                                 onChange={handleChange}
                                 rows="4"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || success}
+                                placeholder="Enter product description"
                             />
                         </div>
 
                         <div className={styles.gridRow}>
                             <div className={styles.formRow}>
-                                <label htmlFor="price">Price ($)</label>
+                                <label htmlFor="price">Price ($) *</label>
                                 <input
                                     type="number"
                                     id="price"
@@ -227,12 +284,13 @@ function UpdateProduct() {
                                     min="0"
                                     step="0.01"
                                     required
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || success}
+                                    placeholder="0.00"
                                 />
                             </div>
 
                             <div className={styles.formRow}>
-                                <label htmlFor="quantity">Quantity</label>
+                                <label htmlFor="quantity">Quantity *</label>
                                 <input
                                     type="number"
                                     id="quantity"
@@ -241,26 +299,27 @@ function UpdateProduct() {
                                     onChange={handleChange}
                                     min="0"
                                     required
-                                    disabled={isSubmitting}
+                                    disabled={isSubmitting || success}
+                                    placeholder="0"
                                 />
                             </div>
                         </div>
 
                         <div className={styles.formRow}>
-                            <label htmlFor="category">Category</label>
+                            <label htmlFor="category">Category *</label>
                             <select
                                 id="category"
                                 name="category"
                                 value={updatedProduct.category}
                                 onChange={handleChange}
                                 required
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || success}
                             >
                                 <option value="">Select a category</option>
                                 {Array.isArray(categories) && categories.length > 0 ? (
                                     categories.map(category => (
                                         <option
-                                            key={category.id}
+                                            key={category.id || category._id}
                                             value={category.name}
                                         >
                                             {category.name}
@@ -277,7 +336,7 @@ function UpdateProduct() {
                                 type="button"
                                 onClick={handleCancel}
                                 className={styles.cancelBtn}
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || success}
                             >
                                 Cancel
                             </button>
@@ -298,13 +357,10 @@ function UpdateProduct() {
                     <div className={styles.previewCard}>
                         <div className={styles.previewImageContainer}>
                             <img
-                                src={updatedProduct.imageUrl || "https://picsum.photos/300/200"}
-                                alt="Product Preview"
+                                src={imageError ? "https://picsum.photos/300/200" : (updatedProduct.productImageUrl || "https://picsum.photos/300/200")}
+                                alt={updatedProduct.name || "Product Preview"}
                                 className={styles.previewImage}
-                                onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = "https://via.placeholder.com/300x200?text=Error+Loading+Image";
-                                }}
+                                onError={() => setImageError(true)}
                             />
                             {updatedProduct.quantity === 0 && (
                                 <div className={styles.outOfStockBadge}>Out of Stock</div>
@@ -328,6 +384,11 @@ function UpdateProduct() {
                                 <div className={styles.previewPrice}>
                                     Rs {Number(updatedProduct.price || 0).toFixed(2)}
                                 </div>
+                                {updatedProduct.quantity > 0 && (
+                                    <div className={styles.previewStock}>
+                                        {updatedProduct.quantity} in stock
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
