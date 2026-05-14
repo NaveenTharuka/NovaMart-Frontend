@@ -30,6 +30,7 @@ function AddProduct() {
         loadCategories();
     }, []);
 
+    // ✅ Initialize with empty strings, not undefined
     const [product, setProduct] = useState({
         name: '',
         description: '',
@@ -79,7 +80,16 @@ function AddProduct() {
 
             if (result.success) {
                 setSubmitStatus({ type: 'success', message: 'Product added successfully!' });
-                setProduct({ name: '', description: '', price: '', quantity: '', category: '' });
+
+                // ✅ Reset ALL fields with empty strings (not undefined)
+                setProduct({
+                    name: '',
+                    description: '',
+                    price: '',
+                    quantity: '',
+                    category: '',
+                    imgUrl: ''  // ← This was missing!
+                });
             } else {
                 setSubmitStatus({ type: 'error', message: result.error || 'Failed to add product.' });
             }
@@ -112,7 +122,7 @@ function AddProduct() {
                                     type='text'
                                     placeholder='Enter product name'
                                     name='name'
-                                    value={product.name}
+                                    value={product.name || ''}  // ✅ Safe fallback
                                     onChange={handleChange}
                                     required
                                     disabled={isLoading}
@@ -127,7 +137,7 @@ function AddProduct() {
                                 <textarea
                                     placeholder='Enter product description'
                                     name='description'
-                                    value={product.description}
+                                    value={product.description || ''}  // ✅ Safe fallback
                                     onChange={handleChange}
                                     required
                                     disabled={isLoading}
@@ -143,7 +153,7 @@ function AddProduct() {
                                     <input
                                         type='number'
                                         name='price'
-                                        value={product.price}
+                                        value={product.price || ''}  // ✅ Safe fallback
                                         min='0'
                                         step='0.01'
                                         placeholder='Enter product price'
@@ -162,7 +172,7 @@ function AddProduct() {
                                         type='number'
                                         min='0'
                                         name='quantity'
-                                        value={product.quantity}
+                                        value={product.quantity || ''}  // ✅ Safe fallback
                                         placeholder='Enter product quantity'
                                         onChange={handleChange}
                                         required
@@ -179,7 +189,7 @@ function AddProduct() {
                                 <div className={styles.categoryWrapper}>
                                     <select
                                         name='category'
-                                        value={product.category}
+                                        value={product.category || ''}  // ✅ Safe fallback
                                         onChange={handleChange}
                                         required
                                         disabled={isLoading || isLoadingCategories}
@@ -206,7 +216,7 @@ function AddProduct() {
                                 <input
                                     type='text'
                                     name='imgUrl'
-                                    value={product.imgUrl}
+                                    value={product.imgUrl || ''}  // ✅ Safe fallback
                                     placeholder='Enter product image URL'
                                     onChange={handleChange}
                                     required

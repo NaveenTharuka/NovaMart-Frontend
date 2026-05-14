@@ -60,7 +60,7 @@ export const updateProduct = async (product) => {
 
 export const deleteProduct = async (id) => {
     try {
-        const response = await axiosInstance.delete(`/products/id/${id}`);
+        const response = await axiosInstance.delete(`/products/${id}/delete`);
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, error: error.response?.data?.message || error.message };
