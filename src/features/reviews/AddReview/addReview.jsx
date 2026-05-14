@@ -83,7 +83,7 @@ function AddReview() {
                 <div className={styles.productCard}>
                     <div className={styles.productRow}>
                         <img
-                            src={product.imageUrl ? product.imageUrl : "https://picsum.photos/300/200"}
+                            src={product.imgUrl ? product.imgUrl : "https://picsum.photos/300/200"}
                             alt={product?.name}
                             className={styles.productThumbnail}
 

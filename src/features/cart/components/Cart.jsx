@@ -183,7 +183,7 @@ function Cart() {
                         {/* Image */}
                         <div className={styles.imageContainer}>
                             <img
-                                src={item.imageUrl || "https://picsum.photos/200"}
+                                src={item.imgUrl || "https://picsum.photos/200"}
                                 alt={item.productName || "Product"}
                                 className={styles.productImage}
                                 onError={(e) => {
